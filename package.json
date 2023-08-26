@@ -1,0 +1,68 @@
+{
+  "name": "cpu-ext-trial",
+  "displayName": "cpu-ext-trial",
+  "publisher": "FurtherBank",
+  "description": "",
+  "version": "0.0.1",
+  "repository": "https://github.com/FurtherBank/cpu-ext-trial",
+  "engines": {
+    "vscode": "^1.71.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCustomEditor:cpu-ext-trial.JsonEditor"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "customEditors": [
+      {
+        "viewType": "cpu-ext-trial.JsonEditor",
+        "displayName": "Cpu Json Editor",
+        "selector": [
+          {
+            "filenamePattern": "*.json"
+          }
+        ]
+      }
+    ],
+    "commands": [],
+    "menus": {
+      "explorer/context": []
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn esbuild-base --minify",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts",
+    "test-compile": "tsc -p ./",
+    "pretest": "yarn test-compile && yarn lint",
+    "test": "node ./out/test/runTest.js",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "esbuild": "yarn esbuild-base --sourcemap",
+    "esbuild-watch": "yarn esbuild-base --sourcemap --watch"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.2.0",
+    "@types/lodash": "^4.14.191",
+    "@types/mocha": "^9.1.1",
+    "@types/node": "16.x",
+    "@types/readable-stream": "^2.3.15",
+    "@types/urijs": "^1.19.19",
+    "@types/vscode": "^1.71.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "@vscode/test-electron": "^2.1.5",
+    "esbuild": "^0.17.11",
+    "eslint": "^8.20.0",
+    "glob": "^8.0.3",
+    "mocha": "^10.0.0",
+    "typescript": "^4.7.4"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "quicktype": "^15.1.0"
+  }
+}
