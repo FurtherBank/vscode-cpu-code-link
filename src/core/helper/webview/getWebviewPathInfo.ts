@@ -9,7 +9,7 @@ export interface IWebviewPathInfo {
 
 export const getWebviewPathInfo = (extensionPath: string, htmlPath: string) => {
   // 读取 html，并做环境兼容
-  const rootString = path.join(extensionPath, htmlPath);
+  const rootString = path.join(extensionPath, 'webview-repos', htmlPath);
   const localResourceRoots = vscode.Uri.file(path.join(rootString, '/')).with({
     scheme: 'vscode-resource',
   });

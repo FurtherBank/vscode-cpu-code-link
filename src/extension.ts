@@ -73,7 +73,7 @@ export function activate(context: vscode.ExtensionContext) {
 
         webviewPanel.webview.options = panelOptions;
 
-        loadWebviewHtml(webviewPanel, getWebviewPathInfo(context.extensionPath, webview.htmlPath));
+        loadWebviewHtml(webviewPanel, pathInfo);
 
         // 消息通信，自己负责消息的具体解析和处理
         if (onDidReceiveMessage) {
