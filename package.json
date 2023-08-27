@@ -61,7 +61,8 @@
     "test": "node ./out/test/runTest.js",
     "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
     "esbuild": "yarn esbuild-base --sourcemap",
-    "esbuild-watch": "yarn esbuild-base --sourcemap --watch"
+    "esbuild-watch": "yarn esbuild-base --sourcemap --watch",
+    "publish": "pnpm vsce publish --no-dependencies"
   },
   "devDependencies": {
     "@types/glob": "^7.2.0",
