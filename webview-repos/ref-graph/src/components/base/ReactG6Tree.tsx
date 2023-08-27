@@ -84,7 +84,7 @@ export const ReactG6Tree = (props: {
   
       graph.data(data);
       graph.render();
-      graph.fitView();
+      graph.fitView([40, 40, 40, 40]);
   
       graphRef.current = graph;
     }
