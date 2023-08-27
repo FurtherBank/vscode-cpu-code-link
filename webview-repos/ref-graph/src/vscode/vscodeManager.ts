@@ -1,4 +1,3 @@
-import { IJsonEditorMessage, IJsonEditorState } from '../App';
 
 interface IVscode<T, M = any> {
   postMessage: (message: M) => void;
@@ -7,7 +6,7 @@ interface IVscode<T, M = any> {
 }
 
 export class VscodeManager {
-  static vscode: IVscode<IJsonEditorState, IJsonEditorMessage | string> = {
+  static vscode: IVscode<any, any> = {
     postMessage(message) {
       console.log(`发送信息：${JSON.stringify(message)}`);
     },

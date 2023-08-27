@@ -1,1 +1,1 @@
-export const pluginName = 'cpu-ext-trial';
+export const pluginName = 'cpu-ref-graph';

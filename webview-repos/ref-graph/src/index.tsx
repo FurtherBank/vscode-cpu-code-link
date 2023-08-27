@@ -9,7 +9,12 @@ import callGraph from "./mockData/callGraph.json";
 
 VscodeManager.init(() => {
   VscodeManager.vscode.setState({
-    data: callGraph
+    data: {
+      importPath: 'root',
+      realFilePath: 'root.tsx',
+      children: callGraph
+    }
+  })
 });
 
 export const renderEditor = (state: any) => {

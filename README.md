@@ -1,10 +1,10 @@
-# cpu-ext-trial
+# cpu-ref-graph
 
 ![show](README.assets/show.gif)
 
 ## Features
 
-Can use [cpu-ext-trial](https://github.com/FurtherBank/json-schemaeditor-antd) to edit json files in vscode.
+Can use [cpu-ref-graph](https://github.com/FurtherBank/json-schemaeditor-antd) to edit json files in vscode.
 
 - Can auto generate json schema file of your json by [quicktype](https://github.com/quicktype/quicktype).
 

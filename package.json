@@ -1,10 +1,10 @@
 {
-  "name": "cpu-ext-trial",
-  "displayName": "cpu-ext-trial",
+  "name": "cpu-ref-graph",
+  "displayName": "cpu-ref-graph",
   "publisher": "FurtherBank",
   "description": "",
   "version": "0.0.1",
-  "repository": "https://github.com/FurtherBank/cpu-ext-trial",
+  "repository": "https://github.com/FurtherBank/cpu-ref-graph",
   "engines": {
     "vscode": "^1.71.0"
   },
@@ -12,17 +12,17 @@
     "Other"
   ],
   "activationEvents": [
-    "onCustomEditor:cpu-ext-trial.JsonEditor"
+    "onCustomEditor:cpu-ref-graph.RefGraphViewer"
   ],
   "main": "./out/extension.js",
   "contributes": {
     "customEditors": [
       {
-        "viewType": "cpu-ext-trial.JsonEditor",
+        "viewType": "cpu-ref-graph.RefGraphViewer",
         "displayName": "Cpu Json Editor",
         "selector": [
           {
-            "filenamePattern": "*.json"
+            "filenamePattern": "*.{tsx,ts,jsx,js}"
           }
         ]
       }
@@ -63,6 +63,8 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "quicktype": "^15.1.0"
+    "quicktype": "^15.1.0",
+    "ts-morph": "^19.0.0",
+    "ts-morph-trial": "1.0.2"
   }
 }

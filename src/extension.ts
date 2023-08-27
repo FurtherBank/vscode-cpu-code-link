@@ -7,11 +7,11 @@ import { WebviewManager } from './core/webview/manager';
 import { loadWebviewHtml } from './core/helper/webview/loadWebviewHtml';
 import { getWebviewPathInfo } from './core/helper/webview/getWebviewPathInfo';
 import { ITextEditor } from './core/helper/editor/text/ITextEditor';
-import { JsonEditor } from './webview/json-editor';
+import { RefGraphViewer } from './webview/ref-graph-viewer';
 
 // just fill this array by your commands, then will automatically register
 // note: don't forget to fill the command in package.json
-const commands: typeof Command[] = [];
+const commands: (typeof Command)[] = [];
 
 /**
  * 按照`viewType: webview`的方式，填入插件使用的 webview 即可。
@@ -23,7 +23,7 @@ const commands: typeof Command[] = [];
 WebviewManager.webviews = {};
 
 const customTextEditorWebviews: Record<string, ITextEditor> = {
-  JsonEditor: JsonEditor,
+  RefGraphViewer: RefGraphViewer,
 };
 
 // this method is called when your extension is activated
