@@ -12,7 +12,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onCustomEditor:cpu-ref-graph.RefGraphViewer"
+    "onCustomEditor:cpu-ref-graph.RefGraphViewer",
+    "onCommand:cpu-ref-graph.Start"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -24,12 +25,30 @@
           {
             "filenamePattern": "*.{tsx,ts,jsx,js}"
           }
-        ]
+        ],
+        "priority": "option"
       }
     ],
-    "commands": [],
+    "commands": [
+      {
+        "command": "cpu-ref-graph.Start",
+        "title": "Open Ref Graph",
+        "category": "menubar",
+        "icon": {
+          "light": "./assets/icon.svg",
+          "dark": "./assets/icon.svg"
+        }
+      }
+    ],
     "menus": {
-      "explorer/context": []
+      "explorer/context": [],
+      "editor/title": [
+        {
+          "command": "cpu-ref-graph.Start",
+          "when": "resourceLangId == typescriptreact || resourceLangId == typescript || resourceLangId == javascriptreact || resourceLangId == javascript || resourceExt == .tsx || resourceExt == .ts || resourceExt == .jsx || resourceExt == .js",
+          "group": "navigation"
+        }
+      ]
     }
   },
   "scripts": {

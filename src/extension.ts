@@ -8,10 +8,11 @@ import { loadWebviewHtml } from './core/helper/webview/loadWebviewHtml';
 import { getWebviewPathInfo } from './core/helper/webview/getWebviewPathInfo';
 import { ITextEditor } from './core/helper/editor/text/ITextEditor';
 import { RefGraphViewer } from './webview/ref-graph-viewer';
+import { Start } from './commands/start';
 
 // just fill this array by your commands, then will automatically register
 // note: don't forget to fill the command in package.json
-const commands: (typeof Command)[] = [];
+const commands: (typeof Command)[] = [Start];
 
 /**
  * 按照`viewType: webview`的方式，填入插件使用的 webview 即可。

@@ -5,6 +5,7 @@ import { ITextEditorWebview } from '../../core/helper/editor/text/ITextEditor';
 import debounce from 'lodash/debounce';
 import { CallGraphNode, analyzeCallGraph } from 'ts-morph-trial/dist/src/analyzeCallGraph';
 import { Project } from 'ts-morph';
+import { findTsConfig } from './findTsConfig';
 
 export const RefGraphViewer = (
   document: vscode.TextDocument,
@@ -38,11 +39,13 @@ export const RefGraphViewer = (
       if (!workspaceFolder) {
         return;
       }
+      const tsConfigFilePath = await findTsConfig(document.uri.fsPath);
       const project = new Project({
-        tsConfigFilePath: path.join(workspaceFolder.uri.fsPath, 'tsconfig.json'),
+        tsConfigFilePath,
       });
       const realFilePath = document.uri.fsPath;
-      const sourceFile = project.getSourceFileOrThrow(document.uri.fsPath);
+      console.log('[main] 已经打开代码文件', tsConfigFilePath, realFilePath);
+      const sourceFile = project.getSourceFileOrThrow(realFilePath);
       const refgraph: CallGraphNode = {
         importPath: path.basename(realFilePath, path.extname(realFilePath)),
         realFilePath,
@@ -53,6 +56,7 @@ export const RefGraphViewer = (
         data: refgraph,
       };
       webviewPanel.webview.postMessage(message);
+      
       console.log('已经post', message);
     },
   };

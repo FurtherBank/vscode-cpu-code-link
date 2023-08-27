@@ -10,15 +10,7 @@ export class Start extends Command {
     if (activeEditor) {
       const fileUri = activeEditor.document.uri;
       // 打开只读文档
-      vscode.workspace.openTextDocument(fileUri).then((document) => {
-        // 显示文档在新的编辑器栏中
-        vscode.window.showTextDocument(document, {
-          viewColumn: vscode.ViewColumn.Two, // 在第二栏显示
-          preview: false, // 预览模式（只读）
-          preserveFocus: true, // 保持焦点在当前编辑器
-          selection: new vscode.Selection(0, 0, 0, 0), // 设置初始选择范围
-        });
-      });
+      vscode.commands.executeCommand('vscode.openWith', fileUri, 'cpu-ref-graph.RefGraphViewer', vscode.ViewColumn.Two);
     }
   }
 }
