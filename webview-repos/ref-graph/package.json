@@ -13,7 +13,6 @@
     "@types/react-dom": "^18.0.9",
     "ahooks": "^3.7.3",
     "antd": "^4.24.5",
-    "json-schemaeditor-antd": "^0.1.5",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

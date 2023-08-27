@@ -1,0 +1,40 @@
+[
+  {
+    "importPath": "path",
+    "defaultName": "path",
+    "namedImports": []
+  },
+  {
+    "importPath": "fs",
+    "defaultName": "fs",
+    "namedImports": []
+  },
+  {
+    "importPath": "ts-morph",
+    "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+    "namedImports": [
+      "Project"
+    ]
+  },
+  {
+    "importPath": "./src/analyzeImports",
+    "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeImports.ts",
+    "namedImports": [
+      "analyzeImports"
+    ]
+  },
+  {
+    "importPath": "./src/analyzeExports",
+    "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeExports.ts",
+    "namedImports": [
+      "analyzeExports"
+    ]
+  },
+  {
+    "importPath": "./src/analyzeCallGraph",
+    "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeCallGraph.ts",
+    "namedImports": [
+      "analyzeCallGraph"
+    ]
+  }
+]

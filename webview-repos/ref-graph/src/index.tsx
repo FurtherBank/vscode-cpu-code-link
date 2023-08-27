@@ -1,34 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App, { IJsonEditorMessage, IJsonEditorState } from './App';
+import App from './App';
 import reportWebVitals from './reportWebVitals';
 import { VscodeManager } from './vscode/vscodeManager';
-import { metaSchema } from 'json-schemaeditor-antd';
+import callGraph from "./mockData/callGraph.json";
+
 
 VscodeManager.init(() => {
   VscodeManager.vscode.setState({
-    data: JSON.stringify({
-      "$schema": "http://json-schema.org/draft-06/schema#",
-      "type": "array",
-      "items": {
-        "type": "string",
-        "format": "row"
-      },
-      "definitions": {}
-    }, null, 2),
-    schema: metaSchema,
-  })
+    data: callGraph
 });
 
-export const renderEditor = (state: IJsonEditorState) => {
-  const { data, schema, jsonIsSchema } = state
+export const renderEditor = (state: any) => {
+  const { data } = state
 
   const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
 
   root.render(
     <React.StrictMode>
-      <App data={data} schema={schema} jsonIsSchema={jsonIsSchema}/>
+      <App data={data} />
     </React.StrictMode>
   );
 
@@ -40,7 +31,7 @@ export const renderEditor = (state: IJsonEditorState) => {
 
 }
 
-function listener(event: MessageEvent<IJsonEditorMessage>) {
+function listener(event: MessageEvent<any>) {
   // 通过处理机制来处理
   const { data } = event
   console.log(`收到激活信息：`, event);
@@ -54,7 +45,7 @@ function listener(event: MessageEvent<IJsonEditorMessage>) {
   window.removeEventListener('message', listener);
 }
 
-const oldState = VscodeManager.vscode.getState() as IJsonEditorState
+const oldState = VscodeManager.vscode.getState() 
 if (oldState !== undefined) {
   console.log('查询到 oldState', oldState);
   

@@ -1,0 +1,64 @@
+[
+  {
+    "importPath": "path",
+    "defaultName": "path"
+  },
+  {
+    "importPath": "fs",
+    "defaultName": "fs"
+  },
+  {
+    "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+    "importPath": "ts-morph"
+  },
+  {
+    "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeImports.ts",
+    "importPath": "./src/analyzeImports",
+    "children": [
+      {
+        "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+        "importPath": "ts-morph"
+      }
+    ]
+  },
+  {
+    "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeExports.ts",
+    "importPath": "./src/analyzeExports",
+    "children": [
+      {
+        "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+        "importPath": "ts-morph"
+      }
+    ]
+  },
+  {
+    "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeCallGraph.ts",
+    "importPath": "./src/analyzeCallGraph",
+    "children": [
+      {
+        "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+        "importPath": "ts-morph"
+      },
+      {
+        "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeImports.ts",
+        "importPath": "./analyzeImports",
+        "children": [
+          {
+            "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+            "importPath": "ts-morph"
+          }
+        ]
+      },
+      {
+        "realFilePath": "E:/Front-end/ts-morph-trial/src/analyzeExports.ts",
+        "importPath": "./analyzeExports",
+        "children": [
+          {
+            "realFilePath": "E:/Front-end/ts-morph-trial/node_modules/ts-morph/lib/ts-morph.d.ts",
+            "importPath": "ts-morph"
+          }
+        ]
+      }
+    ]
+  }
+]
