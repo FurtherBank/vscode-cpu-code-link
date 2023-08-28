@@ -1,0 +1,30 @@
+{
+  "name": "vscode-cpu-common",
+  "version": "0.0.1",
+  "description": "test examples of cpu json editor",
+  "keywords": [],
+  "license": "MIT",
+  "module": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "files": [
+    "dist",
+    "compiled"
+  ],
+  "scripts": {
+    "build:deps": "father prebundle",
+    "build": "tsc",
+    "dev": "father dev",
+    "prepublishOnly": "father doctor && npm run build"
+  },
+  "dependencies": {
+  },
+  "devDependencies": {
+    "father": "^4.1.9"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "authors": [
+    "furtherbank"
+  ]
+}

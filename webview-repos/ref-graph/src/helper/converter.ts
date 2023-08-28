@@ -1,34 +1,29 @@
 import { TreeGraphData } from '@antv/g6';
 import { uniqueId } from 'lodash';
-import { isInternalCodeModule } from 'ts-morph-trial/dist/src/analyzeCallGraph';
+import { CallGraphNode, isInternalCodeModule } from 'ts-project-toolkit';
+import { theme } from './theme';
 
-export interface ImportInfo {
-  importPath: string;
-  realFilePath?: string;
-  defaultName?: string;
-  namespaceName?: string;
-  namedImports: string[];
+export interface ConvertConfig {
+  ignore?: {
+    external?: boolean;
+  };
 }
-export type CallGraphNode = Omit<ImportInfo, 'namedImports'> & {
-  children?: CallGraphNode[];
-};
 
-const moduleTypeStyleMap = {
-  jsx: {
-    fill: '#b0b0ff',
-    stroke: '#096dd9',
-  },
-  js: {
-    fill: '#fff',
-    stroke: '#096dd9',
-  },
-  external: {
-    fill: '#ddd',
-    stroke: '#096dd9',
-  },
-};
-
-const getModuleTypeStyle = (data: CallGraphNode) => {
+const getModuleTypeStyle = (data: CallGraphNode, isDark: boolean, config: ConvertConfig) => {
+  const moduleTypeStyleMap = {
+    jsx: {
+      fill: theme('#b0b0ff', isDark),
+      stroke: theme('#096dd9', isDark),
+    },
+    js: {
+      fill: theme('#fff', isDark),
+      stroke: theme('#096dd9', isDark),
+    },
+    external: {
+      fill: theme('#ddd', isDark),
+      stroke: theme('#096dd9', isDark),
+    },
+  };
   const { importPath, realFilePath, defaultName, namespaceName, children } = data;
   const ext = realFilePath?.split('.').pop() ?? '';
   if (!isInternalCodeModule(realFilePath)) return moduleTypeStyleMap.external;
@@ -37,16 +32,23 @@ const getModuleTypeStyle = (data: CallGraphNode) => {
   return moduleTypeStyleMap.external;
 };
 
-export const convertTreeData = (data: CallGraphNode): TreeGraphData => {
+export const convertTreeData = (
+  data: CallGraphNode,
+  isDark: boolean = false,
+  config: ConvertConfig = {},
+  isRoot = true
+): TreeGraphData => {
   const { importPath, realFilePath, defaultName, namespaceName, children } = data;
   const label = importPath.split('/').pop() ?? '';
   // const description = realFilePath || importPath;
+  if (!isRoot) {
+  }
   const treeData: TreeGraphData = {
     id: uniqueId(),
     label,
     // description,
-    children: children?.map(convertTreeData),
-    style: getModuleTypeStyle(data),
+    children: children?.map((child) => convertTreeData(child, isDark, config, false)).filter(Boolean),
+    style: getModuleTypeStyle(data, isDark, config),
   };
   return treeData;
 };

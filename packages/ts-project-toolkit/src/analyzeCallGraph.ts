@@ -27,7 +27,7 @@ export const isInternalCodeModule = (realFilePath: string | undefined) => {
  * @param sourceFile
  * @returns
  */
-export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<string>) => {
+export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<SourceFile>) => {
   if (!analyzedFiles) {
     analyzedFiles = new Set();
   }
@@ -35,12 +35,12 @@ export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<str
   return importModulesInfo
     .map((importModuleInfo): CallGraphNode | false => {
       const { realFilePath, importPath, defaultName, namespaceName, namedImports } = importModuleInfo;
-      if (analyzedFiles!.has(realFilePath!)) {
+      if (analyzedFiles!.has(sourceFile)) {
         return false;
       }
       if (isInternalCodeModule(realFilePath)) {
         const exportSourceFile = sourceFile.getProject().getSourceFile(realFilePath!);
-        if (realFilePath) analyzedFiles!.add(realFilePath);
+        if (realFilePath) analyzedFiles!.add(sourceFile);
         if (exportSourceFile) {
           const { defaultExport, namedExports } = analyzeExports(exportSourceFile!);
           // 这里认为 default 导出的不是 type，只对 named 导出的 type 进行处理

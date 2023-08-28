@@ -1,13 +1,15 @@
 import React, { useEffect, useRef, useCallback, SyntheticEvent } from 'react';
 import { TreeGraph, Graph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
 import './resize-canvas.css';
+import { theme } from '../../helper/theme';
 
 export const ReactG6Tree = (props: {
   data: GraphData | TreeGraphData | undefined;
   options: Omit<GraphOptions, 'container'>;
   domAttributes?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+  isDark?: boolean;
 }) => {
-  const { data, options, domAttributes = {} } = props;
+  const { data, options, domAttributes = {}, isDark } = props;
   const { className = '', ...restDomAttributes } = domAttributes;
   const ref = useRef<HTMLDivElement>(null);
   const graphRef = useRef<Graph | null>(null);
@@ -78,6 +80,9 @@ export const ReactG6Tree = (props: {
           labelCfg: {
             offset: 10,
             position: node.children && node.children.length > 0 ? 'left' : 'right',
+            style: {
+              fill: theme('#000', isDark)
+            }
           },
         };
       });

@@ -86,7 +86,6 @@
     "lodash": "^4.17.21",
     "quicktype": "^15.1.0",
     "ts-morph": "^19.0.0",
-    "ts-morph-trial": "1.0.2",
     "ts-project-toolkit": "workspace:^1.0.2"
   }
 }

@@ -4,6 +4,7 @@ import { convertTreeData } from "../../../helper/converter";
 
 interface RelationGraphProps {
   data: any;
+  isDark: boolean;
 }
 
 const staticOptions = {
@@ -24,15 +25,15 @@ const staticOptions = {
 };
 
 export const RefGraph = (props: RelationGraphProps) => {
-  const { data } = props;
+  const { data, isDark } = props;
 
   const convertedData = useMemo(() => {
-    return convertTreeData(data);
+    return convertTreeData(data, isDark);
   }, [data]);
 
   return (
     <div style={{ flex: 1, overflow: 'hidden' }}>
-      <ReactG6Tree data={convertedData} options={staticOptions} domAttributes={{ style: { width: '100vw', height: '100vh' } }} />
+      <ReactG6Tree data={convertedData} options={staticOptions} domAttributes={{ style: { width: '100vw', height: '100vh' } }} isDark={isDark} />
     </div>
   );
 };
