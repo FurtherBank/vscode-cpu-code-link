@@ -42,7 +42,7 @@ export const RefGraphViewer = (
     const realFilePath = document.uri.fsPath;
     console.log('[main] 已经打开代码文件', tsConfigFilePath, realFilePath);
     const sourceFile = project.getSourceFileOrThrow(realFilePath);
-    const refgraph: CallGraphNode = {
+    const refGraph: CallGraphNode = {
       importPath: path.basename(realFilePath, path.extname(realFilePath)),
       realFilePath,
       children: analyzeCallGraph(sourceFile), 
@@ -50,7 +50,7 @@ export const RefGraphViewer = (
     const message = {
       msgType: 'init',
       data: {
-        refgraph,
+        refGraph,
         isDark: vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark,
       },
     };
