@@ -1,9 +1,7 @@
 {
   "compilerOptions": {
     "declaration": true,
-    "lib": [
-      "esnext"
-    ],
+    "lib": ["esnext"],
     "sourceMap": true,
     "outDir": "dist",
     "module": "commonjs",
@@ -14,12 +12,6 @@
     "moduleResolution": "node"
   },
   "allowJs": true,
-  "include": [
-    "src/**/*",
-    "package.json",
-    "index.ts"
-, "../../webview-repos/ref-graph/src/helper/theme.ts"  ],
-  "exclude": [
-    "**/*.test.ts"
-  ]
+  "include": ["src/**/*", "package.json", "index.ts"],
+  "exclude": ["**/*.test.ts"]
 }

@@ -70,7 +70,7 @@ export const ReactG6Tree = (props: {
             return 10;
           },
           getHGap: function getHGap() {
-            return 100;
+            return 60;
           },
         },
       });

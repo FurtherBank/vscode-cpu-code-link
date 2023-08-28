@@ -12,16 +12,16 @@ export interface ConvertConfig {
 const getModuleTypeStyle = (data: CallGraphNode, isDark: boolean, config: ConvertConfig) => {
   const moduleTypeStyleMap = {
     jsx: {
-      fill: theme('#b0b0ff', isDark),
+      fill: theme('#4080ff', isDark),
       stroke: theme('#096dd9', isDark),
     },
     js: {
-      fill: theme('#fff', isDark),
+      fill: theme('#80b0ff', isDark),
       stroke: theme('#096dd9', isDark),
     },
     external: {
-      fill: theme('#ddd', isDark),
-      stroke: theme('#096dd9', isDark),
+      fill: theme('#e2e2e2', isDark),
+      stroke: theme('#6d9fd9', isDark),
     },
   };
   const { importPath, realFilePath, defaultName, namespaceName, children } = data;
@@ -47,7 +47,7 @@ export const convertTreeData = (
     id: uniqueId(),
     label,
     // description,
-    children: children?.map((child) => convertTreeData(child, isDark, config, false)).filter(Boolean),
+    children: children?.map((child: CallGraphNode) => convertTreeData(child, isDark, config, false)).filter(Boolean),
     style: getModuleTypeStyle(data, isDark, config),
   };
   return treeData;

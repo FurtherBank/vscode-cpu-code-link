@@ -32,17 +32,20 @@ export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<Sou
     analyzedFiles = new Set();
   }
   const importModulesInfo = analyzeImports(sourceFile);
+  console.log(`[info] imports of ${sourceFile.getFilePath()}`, importModulesInfo);
+
   return importModulesInfo
-    .map((importModuleInfo): CallGraphNode | false => {
+    .map((importModuleInfo) => {
       const { realFilePath, importPath, defaultName, namespaceName, namedImports } = importModuleInfo;
       if (analyzedFiles!.has(sourceFile)) {
         return false;
       }
       if (isInternalCodeModule(realFilePath)) {
         const exportSourceFile = sourceFile.getProject().getSourceFile(realFilePath!);
-        if (realFilePath) analyzedFiles!.add(sourceFile);
         if (exportSourceFile) {
           const { defaultExport, namedExports } = analyzeExports(exportSourceFile!);
+          console.log(`[info] exports of ${importPath}`, { defaultExport, namedExports });
+          
           // 这里认为 default 导出的不是 type，只对 named 导出的 type 进行处理
           const importedItems = namedImports.map((name) => {
             const isTypeOnly = namedExports.some((item) => item.name === name && item.isTypeOnly);
@@ -55,7 +58,8 @@ export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<Sou
               importPath,
               defaultName,
               namespaceName,
-              children: analyzeCallGraph(exportSourceFile),
+              // children 在下一个 map 中计算，从而实现层次遍历
+              children: exportSourceFile,
             };
           } else {
             return false;
@@ -69,6 +73,22 @@ export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<Sou
         defaultName,
         namespaceName,
       };
+    })
+    .map((item) => {
+      if (!item) {
+        return false
+      } else {
+        if (item.children) {
+          const { children: exportSourceFile, ...rest } = item;
+          analyzedFiles!.add(exportSourceFile);
+          const children = analyzeCallGraph(exportSourceFile, analyzedFiles) as CallGraphNode[];
+          return {
+            children,
+            ...rest
+          }
+        }
+        return item;
+      }
     })
     .filter(Boolean) as CallGraphNode[];
 };
