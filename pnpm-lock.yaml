@@ -1,48 +1,51 @@
 lockfileVersion: 5.4
 
-specifiers:
-  '@types/glob': ^7.2.0
-  '@types/lodash': ^4.14.191
-  '@types/mocha': ^9.1.1
-  '@types/node': 16.x
-  '@types/readable-stream': ^2.3.15
-  '@types/urijs': ^1.19.19
-  '@types/vscode': ^1.71.0
-  '@typescript-eslint/eslint-plugin': ^5.31.0
-  '@typescript-eslint/parser': ^5.31.0
-  '@vscode/test-electron': ^2.1.5
-  esbuild: ^0.17.11
-  eslint: ^8.20.0
-  glob: ^8.0.3
-  lodash: ^4.17.21
-  mocha: ^10.0.0
-  quicktype: ^15.1.0
-  ts-morph: ^19.0.0
-  ts-morph-trial: 1.0.2
-  typescript: ^4.7.4
+importers:
 
-dependencies:
-  lodash: 4.17.21
-  quicktype: 15.1.0
-  ts-morph: 19.0.0
-  ts-morph-trial: 1.0.2
-
-devDependencies:
-  '@types/glob': 7.2.0
-  '@types/lodash': 4.14.191
-  '@types/mocha': 9.1.1
-  '@types/node': 16.11.60
-  '@types/readable-stream': 2.3.15
-  '@types/urijs': 1.19.19
-  '@types/vscode': 1.71.0
-  '@typescript-eslint/eslint-plugin': 5.38.0_4gkcvl6qsi23tqqawfqgcwtp54
-  '@typescript-eslint/parser': 5.38.0_7ilbxdl5iguzcjriqqcg2m5cku
-  '@vscode/test-electron': 2.1.5
-  esbuild: 0.17.11
-  eslint: 8.24.0
-  glob: 8.0.3
-  mocha: 10.0.0
-  typescript: 4.8.3
+  .:
+    specifiers:
+      '@types/glob': ^7.2.0
+      '@types/lodash': ^4.14.191
+      '@types/mocha': ^9.1.1
+      '@types/node': 16.x
+      '@types/readable-stream': ^2.3.15
+      '@types/urijs': ^1.19.19
+      '@types/vscode': ^1.71.0
+      '@typescript-eslint/eslint-plugin': ^5.31.0
+      '@typescript-eslint/parser': ^5.31.0
+      '@vscode/test-electron': ^2.1.5
+      esbuild: ^0.17.11
+      eslint: ^8.20.0
+      glob: ^8.0.3
+      lodash: ^4.17.21
+      mocha: ^10.0.0
+      quicktype: ^15.1.0
+      ts-morph: ^19.0.0
+      ts-morph-trial: 1.0.2
+      ts-project-toolkit: workspace:^1.0.2
+      typescript: ^4.7.4
+    dependencies:
+      lodash: 4.17.21
+      quicktype: 15.1.0
+      ts-morph: 19.0.0
+      ts-morph-trial: 1.0.2
+      ts-project-toolkit: link:packages/ts-project-toolkit
+    devDependencies:
+      '@types/glob': 7.2.0
+      '@types/lodash': 4.14.191
+      '@types/mocha': 9.1.1
+      '@types/node': 16.11.60
+      '@types/readable-stream': 2.3.15
+      '@types/urijs': 1.19.19
+      '@types/vscode': 1.71.0
+      '@typescript-eslint/eslint-plugin': 5.38.0_4gkcvl6qsi23tqqawfqgcwtp54
+      '@typescript-eslint/parser': 5.38.0_7ilbxdl5iguzcjriqqcg2m5cku
+      '@vscode/test-electron': 2.1.5
+      esbuild: 0.17.11
+      eslint: 8.24.0
+      glob: 8.0.3
+      mocha: 10.0.0
+      typescript: 4.8.3
 
 packages:
 

@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "lib": [
+      "esnext"
+    ],
+    "sourceMap": true,
+    "outDir": "dist",
+    "module": "commonjs",
+    "target": "esnext",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "strict": true,
+    "moduleResolution": "node"
+  },
+  "allowJs": true,
+  "include": [
+    "src/**/*",
+    "package.json",
+    "index.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts"
+  ]
+}

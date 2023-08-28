@@ -1,0 +1,32 @@
+{
+  "name": "ts-project-toolkit",
+  "version": "1.0.2",
+  "description": "",
+  "main": "./src/index.ts",
+  "scripts": {
+    "start": "ts-node index.ts",
+    "build": "tsc",
+    "test": "mocha --require ts-node/register src/**/*.test.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "ts-morph": "^19.0.0",
+    "typescript": "^5.2.2"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^20.5.6",
+    "chai": "^4.3.8",
+    "mocha": "^10.2.0",
+    "ts-node": "^10.9.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "authors": [
+    "furtherbank"
+  ]
+}
