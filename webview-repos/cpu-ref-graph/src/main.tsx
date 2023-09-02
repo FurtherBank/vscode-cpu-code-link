@@ -7,11 +7,7 @@ import { createRoot } from 'react-dom/client';
 VscodeManager.init(() => {
   VscodeManager.vscode.setState({
     data: {
-      refGraph: {
-        importPath: 'root',
-        realFilePath: 'root.tsx',
-        children: callGraph,
-      },
+      refGraph: callGraph,
       isDark: true,
     },
   });

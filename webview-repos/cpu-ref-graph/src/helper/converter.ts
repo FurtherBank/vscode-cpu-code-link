@@ -1,7 +1,10 @@
-import { TreeGraphData } from '@antv/g6';
-import { uniqueId } from 'lodash';
-import { CallGraphNode, isInternalCodeModule } from 'ts-project-toolkit/src/analyzeCallGraph';
-import { theme } from './theme';
+import { TreeGraphData } from "@antv/g6";
+import {
+  CallGraphNode,
+  isInternalCodeModule,
+} from "ts-project-toolkit/src/analyzeCallGraph";
+import { calculateNodeSize } from "./compute";
+import { theme } from "./theme";
 
 export interface ConvertConfig {
   ignore?: {
@@ -9,56 +12,86 @@ export interface ConvertConfig {
   };
 }
 
-const getModuleTypeStyle = (data: CallGraphNode, isDark: boolean, config: ConvertConfig) => {
+const getModuleTypeStyle = (
+  data: CallGraphNode,
+  isDark: boolean,
+  config: ConvertConfig
+) => {
   const moduleTypeStyleMap = {
     jsx: {
-      fill: theme('#4080ff', isDark),
-      stroke: theme('#096dd9', isDark),
+      stroke: theme("#4080ff", isDark),
     },
     js: {
-      fill: theme('#80b0ff', isDark),
-      stroke: theme('#096dd9', isDark),
+      stroke: theme("#80b0ff", isDark),
     },
     class: {
-      fill: theme('#b0ff80', isDark),
-      stroke: theme('#6dd909', isDark),
+      stroke: theme("#b0ff80", isDark),
     },
     hook: {
-      fill: theme('#ffb080', isDark),
-      stroke: theme('#d96d09', isDark),
+      stroke: theme("#ffb080", isDark),
     },
     external: {
-      fill: theme('#e2e2e2', isDark),
-      stroke: theme('#6d9fd9', isDark),
+      stroke: theme("#e2e2e2", isDark),
     },
-
-
   };
-  const { importPath, realFilePath, defaultName, namespaceName, children } = data;
-  const ext = realFilePath?.split('.').pop() ?? '';
+  const {
+    importPath,
+    realFilePath,
+    defaultName,
+    namespaceName,
+    children,
+    stat: { size = 0 } = {},
+  } = data;
+  const ext = realFilePath?.split(".").pop() ?? "";
   if (!isInternalCodeModule(realFilePath)) return moduleTypeStyleMap.external;
-  if (['tsx', 'jsx'].includes(ext)) return moduleTypeStyleMap.jsx;
-  if (['ts', 'js'].includes(ext)) return moduleTypeStyleMap.js;
+  if (["tsx", "jsx"].includes(ext)) return moduleTypeStyleMap.jsx;
+  if (["ts", "js"].includes(ext)) return moduleTypeStyleMap.js;
   return moduleTypeStyleMap.external;
 };
 
 export const convertTreeData = (
   data: CallGraphNode,
-  isDark: boolean = false,
+  isDark = false,
   config: ConvertConfig = {},
-  isRoot = true
+  pointer = []
 ): TreeGraphData => {
-  const { importPath, realFilePath, defaultName, namespaceName, children } = data;
-  const label = importPath.split('/').pop() ?? '';
-  // const description = realFilePath || importPath;
-  if (!isRoot) {
+  try {
+    const {
+      importPath,
+      realFilePath,
+      defaultName,
+      namespaceName,
+      children,
+      stat: { size = 0 } = {},
+    } = data;
+    const label = importPath.split("/").pop() ?? "";
+    const depth = pointer.length;
+    const filePointer = pointer.concat([label]);
+
+    // const description = realFilePath || importPath;
+    if (pointer.length === 0) {
+    }
+    const treeDataChildren = children
+      ?.map((child: CallGraphNode) =>
+        convertTreeData(child, isDark, config, filePointer)
+      )
+      .filter(Boolean);
+    const treeData: TreeGraphData = {
+      id: filePointer.join("/"),
+      label,
+      // description,
+      children: treeDataChildren,
+      style: {
+        lineWidth: calculateNodeSize(size),
+        ...getModuleTypeStyle(data, isDark, config),
+      },
+      collapsed: treeDataChildren?.length > 0 && depth >= 3,
+    };
+    return treeData;
+  } catch (error) {
+    console.group("convertTreeData");
+    console.error(error);
+    console.log(data);
+    console.groupEnd();
   }
-  const treeData: TreeGraphData = {
-    id: uniqueId(),
-    label,
-    // description,
-    children: children?.map((child: CallGraphNode) => convertTreeData(child, isDark, config, false)).filter(Boolean),
-    style: getModuleTypeStyle(data, isDark, config),
-  };
-  return treeData;
 };

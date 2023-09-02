@@ -18,18 +18,25 @@ export const ReactG6Tree = (props: {
     if (!graphRef.current) {
       const rect = ref.current!.getBoundingClientRect();
       console.log(rect.width, rect.height);
-      
+
       const graph = new TreeGraph({
         container: ref.current!,
         width: rect.width,
         height: rect.height - 6,
+        animateCfg: {
+          duration: 100, // duration in milliseconds, adjust this to your liking
+          // easing: 'easeQuadIn', // easing function, you can choose others as well
+        },
         modes: {
           default: [
             {
               type: 'collapse-expand',
               onChange: function onChange(item, collapsed) {
                 const data = item!.getModel();
-                data.collapsed = collapsed;
+                // data.collapsed = collapsed;
+                console.log('[info] node data', data);
+                data.style.fill = collapsed ? theme('#d0d0d0', isDark) : 'transparent',
+                graph.updateItem(data.id, data)
                 return true;
               },
             },
@@ -67,30 +74,34 @@ export const ReactG6Tree = (props: {
             return 16;
           },
           getVGap: function getVGap() {
-            return 10;
+            return 2;
           },
           getHGap: function getHGap() {
             return 60;
           },
         },
       });
-  
+
       graph.node(function (node) {
+        const { collapsed, style: { stroke } = {} } = node
         return {
           labelCfg: {
-            offset: 10,
+            offset: 5,
             position: node.children && node.children.length > 0 ? 'left' : 'right',
             style: {
               fill: theme('#000', isDark)
             }
           },
+          style: {
+            fill: collapsed ? theme('#d0d0d0', isDark) : 'transparent',
+          }
         };
       });
-  
+
       graph.data(data);
       graph.render();
       graph.fitView([40, 40, 40, 40]);
-  
+
       graphRef.current = graph;
 
       return () => {
