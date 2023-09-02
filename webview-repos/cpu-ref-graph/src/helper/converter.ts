@@ -1,6 +1,6 @@
 import { TreeGraphData } from '@antv/g6';
 import { uniqueId } from 'lodash';
-import { CallGraphNode, isInternalCodeModule } from 'ts-project-toolkit';
+import { CallGraphNode, isInternalCodeModule } from 'ts-project-toolkit/src/analyzeCallGraph';
 import { theme } from './theme';
 
 export interface ConvertConfig {
@@ -19,10 +19,20 @@ const getModuleTypeStyle = (data: CallGraphNode, isDark: boolean, config: Conver
       fill: theme('#80b0ff', isDark),
       stroke: theme('#096dd9', isDark),
     },
+    class: {
+      fill: theme('#b0ff80', isDark),
+      stroke: theme('#6dd909', isDark),
+    },
+    hook: {
+      fill: theme('#ffb080', isDark),
+      stroke: theme('#d96d09', isDark),
+    },
     external: {
       fill: theme('#e2e2e2', isDark),
       stroke: theme('#6d9fd9', isDark),
     },
+
+
   };
   const { importPath, realFilePath, defaultName, namespaceName, children } = data;
   const ext = realFilePath?.split('.').pop() ?? '';

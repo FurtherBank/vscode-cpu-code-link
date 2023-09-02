@@ -25,7 +25,7 @@ export const RefGraphViewer = (
         // localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'web-source/dist'))],
       };
     },
-    htmlPath: 'ref-graph/build',
+    htmlPath: 'cpu-ref-graph/dist',
     onDidReceiveMessage: async function () {},
   };
 
@@ -45,7 +45,7 @@ export const RefGraphViewer = (
     const refGraph: CallGraphNode = {
       importPath: path.basename(realFilePath, path.extname(realFilePath)),
       realFilePath,
-      children: analyzeCallGraph(sourceFile), 
+      children: analyzeCallGraph(sourceFile) as CallGraphNode[], 
     }
     const message = {
       msgType: 'init',

@@ -11,4 +11,5 @@ vsc-extension-quickstart.md
 **/node_modules/**
 webview-repos/**/*.*
 !webview-repos/*/build/**
+!webview-repos/*/dist/**
 packages/**

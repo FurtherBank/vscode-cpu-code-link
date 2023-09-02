@@ -92,6 +92,11 @@ export const ReactG6Tree = (props: {
       graph.fitView([40, 40, 40, 40]);
   
       graphRef.current = graph;
+
+      return () => {
+        graph.destroy();
+        graphRef.current = null;
+      }
     }
   }, []);
 

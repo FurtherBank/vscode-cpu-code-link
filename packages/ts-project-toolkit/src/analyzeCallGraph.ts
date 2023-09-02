@@ -1,8 +1,10 @@
+import fs from 'fs';
 import { SourceFile } from 'ts-morph';
 import { ImportInfo, analyzeImports } from './analyzeImports';
 import { analyzeExports } from './analyzeExports';
 
 export type CallGraphNode = Omit<ImportInfo, 'namedImports'> & {
+  stat?: fs.Stats;
   children?: CallGraphNode[];
 };
 
@@ -27,19 +29,27 @@ export const isInternalCodeModule = (realFilePath: string | undefined) => {
  * @param sourceFile
  * @returns
  */
-export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<SourceFile>) => {
+export function analyzeCallGraph (sourceFile: SourceFile): CallGraphNode[]
+export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles: Set<string>): CallGraphNode[]
+export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles?: Set<string>) {
+  // 1. 防止循环引用
   if (!analyzedFiles) {
     analyzedFiles = new Set();
   }
+  if (analyzedFiles!.has(sourceFile.getFilePath())) {
+    return [];
+  }
+  analyzedFiles!.add(sourceFile.getFilePath());
+
+  // 2. 分析 import
   const importModulesInfo = analyzeImports(sourceFile);
   console.log(`[info] imports of ${sourceFile.getFilePath()}`, importModulesInfo);
 
+  // 3. 层次遍历分析 export 内容
   return importModulesInfo
     .map((importModuleInfo) => {
       const { realFilePath, importPath, defaultName, namespaceName, namedImports } = importModuleInfo;
-      if (analyzedFiles!.has(sourceFile)) {
-        return false;
-      }
+      
       if (isInternalCodeModule(realFilePath)) {
         const exportSourceFile = sourceFile.getProject().getSourceFile(realFilePath!);
         if (exportSourceFile) {
@@ -53,11 +63,13 @@ export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<Sou
           });
           const onlyTypeImports = !defaultExport && importedItems.every((item) => item.isTypeOnly);
           if (!onlyTypeImports) {
+            const stat = fs.statSync(realFilePath!);
             return {
               realFilePath,
               importPath,
               defaultName,
               namespaceName,
+              stat,
               // children 在下一个 map 中计算，从而实现层次遍历
               children: exportSourceFile,
             };
@@ -80,8 +92,7 @@ export const analyzeCallGraph = (sourceFile: SourceFile, analyzedFiles?: Set<Sou
       } else {
         if (item.children) {
           const { children: exportSourceFile, ...rest } = item;
-          analyzedFiles!.add(exportSourceFile);
-          const children = analyzeCallGraph(exportSourceFile, analyzedFiles) as CallGraphNode[];
+          const children = analyzeCallGraph(exportSourceFile, analyzedFiles!);
           return {
             children,
             ...rest

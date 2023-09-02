@@ -1,8 +1,11 @@
 import { SourceFile } from 'ts-morph';
 
+export type ExportType = 'function' | 'variable' | 'class' | 'hook' | 'external';
+
 interface ExportItem {
   name: string;
   isTypeOnly: boolean;
+  exportType?: ExportType
 }
 
 export interface ExportInfo {
@@ -21,7 +24,8 @@ export function analyzeExports(sourceFile: SourceFile): ExportInfo {
       const item = {
         name: f.getName() ?? '',
         isTypeOnly: false,
-      };
+        exportType: 'function',
+      } as const;
       if (f.isDefaultExport()) {
         defaultExport = item;
       } else {
@@ -36,13 +40,30 @@ export function analyzeExports(sourceFile: SourceFile): ExportInfo {
       const item = {
         name: v.getName() ?? '',
         isTypeOnly: false,
-      };
+        exportType: 'variable',
+      } as const;
       if (v.isDefaultExport()) {
         defaultExport = item;
       } else {
         namedExports.push(item);
       }
     });
+    // export classes
+    sourceFile
+      .getClasses()
+      .filter((v) => v.isExported())
+      .forEach((v) => {
+        const item = {
+          name: v.getName() ?? '',
+          isTypeOnly: false,
+          exportType: 'class',
+        } as const;
+        if (v.isDefaultExport()) {
+          defaultExport = item;
+        } else {
+          namedExports.push(item);
+        }
+      });
   // app exports
   const exportModules = sourceFile.getExportDeclarations();
   const exportModulesInfo = exportModules.flatMap((exportDeclaration) => {
