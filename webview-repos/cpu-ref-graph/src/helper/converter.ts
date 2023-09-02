@@ -22,7 +22,7 @@ const getModuleTypeStyle = (
       stroke: theme("#4080ff", isDark),
     },
     js: {
-      stroke: theme("#80b0ff", isDark),
+      stroke: theme("#d0d080", isDark),
     },
     class: {
       stroke: theme("#b0ff80", isDark),
@@ -37,18 +37,31 @@ const getModuleTypeStyle = (
   const {
     importPath,
     realFilePath,
+    exportType,
     defaultName,
     namespaceName,
     children,
     stat: { size = 0 } = {},
   } = data;
   const ext = realFilePath?.split(".").pop() ?? "";
+  // 注意优先级顺序
   if (!isInternalCodeModule(realFilePath)) return moduleTypeStyleMap.external;
+  if (exportType === "hook") return moduleTypeStyleMap.hook;
   if (["tsx", "jsx"].includes(ext)) return moduleTypeStyleMap.jsx;
+  if (exportType === "class") return moduleTypeStyleMap.class;
   if (["ts", "js"].includes(ext)) return moduleTypeStyleMap.js;
   return moduleTypeStyleMap.external;
 };
 
+/**
+ * 将`CallGraphNode`转换为`TreeGraphData`  
+ * 并计算节点和`CallGraphNode`有关的属性
+ * @param data 
+ * @param isDark 
+ * @param config 
+ * @param pointer 
+ * @returns 
+ */
 export const convertTreeData = (
   data: CallGraphNode,
   isDark = false,

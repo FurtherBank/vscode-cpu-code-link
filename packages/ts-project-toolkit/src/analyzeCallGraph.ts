@@ -1,14 +1,15 @@
-import fs from 'fs';
-import { SourceFile } from 'ts-morph';
-import { ImportInfo, analyzeImports } from './analyzeImports';
-import { analyzeExports } from './analyzeExports';
+import fs from "fs";
+import { SourceFile } from "ts-morph";
+import { ImportInfo, analyzeImports } from "./analyzeImports";
+import { ExportItem, ExportType, analyzeExports } from "./analyzeExports";
 
-export type CallGraphNode = Omit<ImportInfo, 'namedImports'> & {
+export type CallGraphNode = Omit<ImportInfo, "namedImports"> & {
   stat?: fs.Stats;
+  exportType?: "hook" | ExportType;
   children?: CallGraphNode[];
 };
 
-const CodeExtension = ['.ts', '.tsx', '.js', '.jsx'];
+const CodeExtension = [".ts", ".tsx", ".js", ".jsx"];
 
 /**
  * 通过 realFilePath 判断是否是内部模块。
@@ -20,8 +21,21 @@ const CodeExtension = ['.ts', '.tsx', '.js', '.jsx'];
  * @returns
  */
 export const isInternalCodeModule = (realFilePath: string | undefined) => {
-  if (!realFilePath || realFilePath?.includes('node_modules')) return false;
+  if (!realFilePath || realFilePath?.includes("node_modules")) return false;
   return CodeExtension.some((ext) => realFilePath.endsWith(ext));
+};
+
+/**
+ * 根据导出信息获取导出内容类型
+ * @param items
+ */
+export const getAggregateExportType = (items: ExportItem[]) => {
+  if (items.find((item) => item.name.startsWith("use") && item.exportType !== "class")) {
+    return "hook";
+  }
+  return ["class", "function", "variable"].find((exportType) => {
+    return items.find((item) => item.exportType === exportType)
+  });
 };
 
 /**
@@ -29,9 +43,15 @@ export const isInternalCodeModule = (realFilePath: string | undefined) => {
  * @param sourceFile
  * @returns
  */
-export function analyzeCallGraph (sourceFile: SourceFile): CallGraphNode[]
-export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles: Set<string>): CallGraphNode[]
-export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles?: Set<string>) {
+export function analyzeCallGraph(sourceFile: SourceFile): CallGraphNode[];
+export function analyzeCallGraph(
+  sourceFile: SourceFile,
+  analyzedFiles: Set<string>
+): CallGraphNode[];
+export function analyzeCallGraph(
+  sourceFile: SourceFile,
+  analyzedFiles?: Set<string>
+) {
   // 1. 防止循环引用
   if (!analyzedFiles) {
     analyzedFiles = new Set();
@@ -43,25 +63,49 @@ export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles?: Set<st
 
   // 2. 分析 import
   const importModulesInfo = analyzeImports(sourceFile);
-  console.log(`[info] imports of ${sourceFile.getFilePath()}`, importModulesInfo);
+  console.log(
+    `[info] imports of ${sourceFile.getFilePath()}`,
+    importModulesInfo
+  );
 
   // 3. 层次遍历分析 export 内容
   return importModulesInfo
     .map((importModuleInfo) => {
-      const { realFilePath, importPath, defaultName, namespaceName, namedImports } = importModuleInfo;
-      
+      const {
+        realFilePath,
+        importPath,
+        defaultName,
+        namespaceName,
+        namedImports,
+      } = importModuleInfo;
+
       if (isInternalCodeModule(realFilePath)) {
-        const exportSourceFile = sourceFile.getProject().getSourceFile(realFilePath!);
+        const exportSourceFile = sourceFile
+          .getProject()
+          .getSourceFile(realFilePath!);
         if (exportSourceFile) {
-          const { defaultExport, namedExports } = analyzeExports(exportSourceFile!);
-          console.log(`[info] exports of ${importPath}`, { defaultExport, namedExports });
-          
-          // 这里认为 default 导出的不是 type，只对 named 导出的 type 进行处理
-          const importedItems = namedImports.map((name) => {
-            const isTypeOnly = namedExports.some((item) => item.name === name && item.isTypeOnly);
-            return { name, isTypeOnly };
+          const { defaultExport, namedExports } = analyzeExports(
+            exportSourceFile!
+          );
+          console.log(`[info] exports of ${importPath}`, {
+            defaultExport,
+            namedExports,
           });
-          const onlyTypeImports = !defaultExport && importedItems.every((item) => item.isTypeOnly);
+
+          // 根据文件导出信息完善 import 信息
+          const importedItems = namedImports
+            .map((name) => {
+              return namedExports.find((item) => item.name === name);
+            })
+            .filter(Boolean) as ExportItem[];
+          if (defaultName && defaultExport) {
+            importedItems.push(defaultExport);
+          }
+
+          // 只采集非 type only 的导入文件
+          const onlyTypeImports = importedItems.every(
+            (item) => item.isTypeOnly
+          );
           if (!onlyTypeImports) {
             const stat = fs.statSync(realFilePath!);
             return {
@@ -69,6 +113,7 @@ export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles?: Set<st
               importPath,
               defaultName,
               namespaceName,
+              exportType: getAggregateExportType(defaultExport ? namedExports.concat([defaultExport]) : namedExports),
               stat,
               // children 在下一个 map 中计算，从而实现层次遍历
               children: exportSourceFile,
@@ -88,18 +133,18 @@ export function analyzeCallGraph (sourceFile: SourceFile, analyzedFiles?: Set<st
     })
     .map((item) => {
       if (!item) {
-        return false
+        return false;
       } else {
         if (item.children) {
           const { children: exportSourceFile, ...rest } = item;
           const children = analyzeCallGraph(exportSourceFile, analyzedFiles!);
           return {
             children,
-            ...rest
-          }
+            ...rest,
+          };
         }
         return item;
       }
     })
     .filter(Boolean) as CallGraphNode[];
-};
+}

@@ -25,7 +25,7 @@ export class VscodeManager {
    *
    * @param mockFunction 如果获取失败，执行的 mock 函数
    */
-  static init(mockFunction?: () => void) {
+  static async init(mockFunction?: () => Promise<void>) {
     // @ts-ignore
     if (window.acquireVsCodeApi) {
       // @ts-ignore
@@ -35,7 +35,7 @@ export class VscodeManager {
       console.log('使用 mock api');
       // mock 的场景下执行这个函数
       if (mockFunction) {
-        mockFunction();
+        await mockFunction();
       }
     }
   }

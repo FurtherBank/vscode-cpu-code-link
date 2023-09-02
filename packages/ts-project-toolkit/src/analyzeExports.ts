@@ -1,11 +1,14 @@
-import { SourceFile } from 'ts-morph';
+import { SourceFile } from "ts-morph";
 
-export type ExportType = 'function' | 'variable' | 'class' | 'hook' | 'external';
+export type ExportType =
+  | "function"
+  | "variable"
+  | "class"
 
-interface ExportItem {
+export interface ExportItem {
   name: string;
   isTypeOnly: boolean;
-  exportType?: ExportType
+  exportType?: ExportType;
 }
 
 export interface ExportInfo {
@@ -22,9 +25,9 @@ export function analyzeExports(sourceFile: SourceFile): ExportInfo {
     .filter((f) => f.isExported())
     .forEach((f) => {
       const item = {
-        name: f.getName() ?? '',
+        name: f.getName() ?? "",
         isTypeOnly: false,
-        exportType: 'function',
+        exportType: "function",
       } as const;
       if (f.isDefaultExport()) {
         defaultExport = item;
@@ -38,9 +41,9 @@ export function analyzeExports(sourceFile: SourceFile): ExportInfo {
     .filter((v) => v.isExported())
     .forEach((v) => {
       const item = {
-        name: v.getName() ?? '',
+        name: v.getName() ?? "",
         isTypeOnly: false,
-        exportType: 'variable',
+        exportType: "variable",
       } as const;
       if (v.isDefaultExport()) {
         defaultExport = item;
@@ -48,29 +51,29 @@ export function analyzeExports(sourceFile: SourceFile): ExportInfo {
         namedExports.push(item);
       }
     });
-    // export classes
-    sourceFile
-      .getClasses()
-      .filter((v) => v.isExported())
-      .forEach((v) => {
-        const item = {
-          name: v.getName() ?? '',
-          isTypeOnly: false,
-          exportType: 'class',
-        } as const;
-        if (v.isDefaultExport()) {
-          defaultExport = item;
-        } else {
-          namedExports.push(item);
-        }
-      });
+  // export classes
+  sourceFile
+    .getClasses()
+    .filter((v) => v.isExported())
+    .forEach((v) => {
+      const item = {
+        name: v.getName() ?? "",
+        isTypeOnly: false,
+        exportType: "class",
+      } as const;
+      if (v.isDefaultExport()) {
+        defaultExport = item;
+      } else {
+        namedExports.push(item);
+      }
+    });
   // app exports
   const exportModules = sourceFile.getExportDeclarations();
   const exportModulesInfo = exportModules.flatMap((exportDeclaration) => {
     const exportedSymbols = exportDeclaration.getNamedExports(); // 获取导出的符号
     return exportedSymbols.map((specifier) => {
-      console.log('Exported symbol name:', specifier.getName()); // 打印导出的符号名称
-      console.log('Symbol kind:', specifier.getKindName()); // 打印符号的类型（类、函数、变量等）
+      console.log("Exported symbol name:", specifier.getName()); // 打印导出的符号名称
+      console.log("Symbol kind:", specifier.getKindName()); // 打印符号的类型（类、函数、变量等）
       return {
         name: specifier.getName(),
         isTypeOnly: specifier.isTypeOnly(),
