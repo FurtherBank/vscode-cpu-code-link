@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "pnpm run start-all",
-    "start-all": "npm-run-all --parallel start-common start-common start-main",
+    "start-all": "npm-run-all --parallel start-common start-ts-toolkit start-main",
     "start-common": "cd ../../packages/common && npm run dev",
     "start-ts-toolkit": "cd ../../packages/ts-project-toolkit && npm run dev",
     "start-main": "pnpm run dev",

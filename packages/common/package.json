@@ -17,6 +17,7 @@
     "prepublishOnly": "father doctor && npm run build"
   },
   "dependencies": {
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "father": "^4.1.9"

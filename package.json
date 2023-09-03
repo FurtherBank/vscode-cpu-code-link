@@ -3,7 +3,7 @@
   "displayName": "cpu-ref-graph",
   "publisher": "FurtherBank",
   "description": "",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "repository": "https://github.com/FurtherBank/cpu-ref-graph",
   "engines": {
     "vscode": "^1.71.0"
@@ -53,14 +53,16 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "yarn esbuild-base --minify",
+    "vscode:prepublish": "pnpm run build",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
     "test-compile": "tsc -p ./",
     "pretest": "yarn test-compile && yarn lint",
     "test": "node ./out/test/runTest.js",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node",
+    "build": "pnpm run build:webview && pnpm run esbuild-base",
+    "build:webview": "cd ./webview-repos/cpu-ref-graph && pnpm run build",
+    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
     "esbuild": "yarn esbuild-base --sourcemap",
     "esbuild-watch": "yarn esbuild-base --sourcemap --watch",
     "publish": "pnpm vsce publish --no-dependencies"
@@ -80,6 +82,7 @@
     "eslint": "^8.20.0",
     "glob": "^8.0.3",
     "mocha": "^10.0.0",
+    "npm-run-all": "^4.1.5",
     "typescript": "^4.7.4"
   },
   "dependencies": {

@@ -5,6 +5,7 @@ import {
 } from "ts-project-toolkit/src/analyzeCallGraph";
 import { calculateNodeSize } from "./compute";
 import { theme } from "./theme";
+import uniqueId from "lodash/uniqueId";
 
 export interface ConvertConfig {
   ignore?: {
@@ -90,7 +91,7 @@ export const convertTreeData = (
       )
       .filter(Boolean);
     const treeData: TreeGraphData = {
-      id: filePointer.join("/"),
+      id: uniqueId(),
       label,
       // description,
       children: treeDataChildren,
