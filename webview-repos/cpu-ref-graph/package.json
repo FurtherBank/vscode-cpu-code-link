@@ -4,7 +4,11 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "start": "pnpm run dev",
+    "start": "pnpm run start-all",
+    "start-all": "npm-run-all --parallel start-common start-common start-main",
+    "start-common": "cd ../../packages/common && npm run dev",
+    "start-ts-toolkit": "cd ../../packages/ts-project-toolkit && npm run dev",
+    "start-main": "pnpm run dev",
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
@@ -12,13 +16,15 @@
   },
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
+    "@ant-design/pro-components": "^2.6.16",
     "@antv/g6": "^4.8.21",
     "antd": "^5.8.4",
     "color": "^4.2.3",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "ts-project-toolkit": "workspace:^1.0.2"
+    "ts-project-toolkit": "workspace:^1.0.2",
+    "vscode-cpu-common": "workspace:^0.0.1"
   },
   "devDependencies": {
     "@types/color": "^3.0.3",

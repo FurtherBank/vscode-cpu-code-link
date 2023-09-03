@@ -4,16 +4,16 @@
   "description": "test examples of cpu json editor",
   "keywords": [],
   "license": "MIT",
-  "module": "dist/src/index.js",
+  "main": "dist/src/index.js",
+  "module": "src/index.ts",
   "types": "dist/src/index.d.ts",
   "files": [
     "dist",
     "compiled"
   ],
   "scripts": {
-    "build:deps": "father prebundle",
     "build": "tsc",
-    "dev": "father dev",
+    "dev": "tsc -w",
     "prepublishOnly": "father doctor && npm run build"
   },
   "dependencies": {

@@ -3,9 +3,10 @@
   "version": "1.0.2",
   "description": "",
   "main": "dist/src/index.js",
+  "module": "src/index.ts",
   "types": "dist/src/index.d.ts",
   "scripts": {
-    "start": "ts-node index.ts",
+    "start": "tsc -w",
     "build": "tsc -p .",
     "test": "mocha --require ts-node/register src/**/*.test.ts",
     "generate-barrels": "barrelsby  -c ./barrel.json --delete",

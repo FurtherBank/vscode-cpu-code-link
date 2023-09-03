@@ -1,5 +1,6 @@
-import { RefGraph } from './components/RefGraph';
-import { CallGraphNode } from 'ts-project-toolkit';
+import { RefGraph } from "./components/RefGraph";
+import { PageContainer } from "@ant-design/pro-components";
+import { CallGraphNode } from "ts-project-toolkit";
 
 export interface RefGraphPageProps {
   data: CallGraphNode;
@@ -8,7 +9,11 @@ export interface RefGraphPageProps {
 
 export const RefGraphPage = (props: RefGraphPageProps) => {
   const { data, isDark } = props;
-  return <RefGraph data={data} isDark={isDark} />;
+  return (
+    <PageContainer>
+      <RefGraph data={data} isDark={isDark} />;
+    </PageContainer>
+  );
 };
 
 export default RefGraphPage;

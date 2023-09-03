@@ -1,3 +1,5 @@
+// import { CpuBridge } from 'vscode-cpu-common/dist/src/core/bridge/CpuBridge';
+
 
 interface IVscode<T, M = any> {
   postMessage: (message: M) => void;

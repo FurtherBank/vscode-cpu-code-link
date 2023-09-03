@@ -1,115 +1,128 @@
-import React, { useEffect, useRef, useCallback, SyntheticEvent } from 'react';
-import { TreeGraph, Graph, GraphData, GraphOptions, TreeGraphData } from '@antv/g6';
-import './resize-canvas.css';
-import { theme } from '../../helper/theme';
+import React, { useEffect, useRef, useCallback, SyntheticEvent } from "react";
+import {
+  TreeGraph,
+  Graph,
+  GraphData,
+  GraphOptions,
+  TreeGraphData,
+} from "@antv/g6";
+import "./resize-canvas.css";
+import { theme } from "../../helper/theme";
 
 export const ReactG6Tree = (props: {
   data: GraphData | TreeGraphData | undefined;
-  options: Omit<GraphOptions, 'container'>;
-  domAttributes?: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+  options: Omit<GraphOptions, "container">;
+  domAttributes?: React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLDivElement>,
+    HTMLDivElement
+  >;
   isDark?: boolean;
 }) => {
   const { data, options, domAttributes = {}, isDark } = props;
-  const { className = '', ...restDomAttributes } = domAttributes;
+  const { className = "", ...restDomAttributes } = domAttributes;
   const ref = useRef<HTMLDivElement>(null);
-  const graphRef = useRef<Graph | null>(null);
+  const [graph, setGraph] = React.useState<Graph | null>(null);
 
   useEffect(() => {
-    if (!graphRef.current) {
-      const rect = ref.current!.getBoundingClientRect();
-      console.log(rect.width, rect.height);
+    const rect = ref.current!.getBoundingClientRect();
+    console.log(rect.width, rect.height);
 
-      const graph = new TreeGraph({
-        container: ref.current!,
-        width: rect.width,
-        height: rect.height - 6,
-        animateCfg: {
-          duration: 100, // duration in milliseconds, adjust this to your liking
-          // easing: 'easeQuadIn', // easing function, you can choose others as well
-        },
-        modes: {
-          default: [
-            {
-              type: 'collapse-expand',
-              onChange: function onChange(item, collapsed) {
-                const data = item!.getModel();
-                // data.collapsed = collapsed;
-                console.log('[info] node data', data);
-                data.style.fill = collapsed ? theme('#d0d0d0', isDark) : 'transparent',
-                graph.updateItem(data.id, data)
-                return true;
-              },
+    const graph = new TreeGraph({
+      container: ref.current!,
+      width: rect.width,
+      height: rect.height - 6,
+      animateCfg: {
+        duration: 100, // duration in milliseconds, adjust this to your liking
+        // easing: 'easeQuadIn', // easing function, you can choose others as well
+      },
+      modes: {
+        default: [
+          {
+            type: "collapse-expand",
+            onChange: function onChange(item, collapsed) {
+              const data = item!.getModel();
+              // data.collapsed = collapsed;
+              console.log("[info] node data", data);
+              (data.style.fill = collapsed
+                ? theme("#d0d0d0", isDark)
+                : "transparent"),
+                graph.updateItem(data.id, data);
+              return true;
             },
-            'drag-canvas',
-            'zoom-canvas',
-            {
-              type: 'tooltip',
-              formatText(model) {
-                return model.label as string;
-              },
-              offset: 10,
+          },
+          "drag-canvas",
+          "zoom-canvas",
+          {
+            type: "tooltip",
+            formatText(model) {
+              return model.label as string;
             },
-          ],
+            offset: 10,
+          },
+        ],
+      },
+      defaultNode: {
+        size: 13,
+        anchorPoints: [
+          [0, 0.5],
+          [1, 0.5],
+        ],
+      },
+      defaultEdge: {
+        type: "cubic-horizontal",
+      },
+      layout: {
+        type: "compactBox",
+        direction: "LR",
+        getId: function getId(d: { id: any }) {
+          return d.id;
         },
-        defaultNode: {
-          size: 13,
-          anchorPoints: [
-            [0, 0.5],
-            [1, 0.5],
-          ],
+        getHeight: function getHeight() {
+          return 16;
         },
-        defaultEdge: {
-          type: 'cubic-horizontal',
+        getWidth: function getWidth() {
+          return 16;
         },
-        layout: {
-          type: 'compactBox',
-          direction: 'LR',
-          getId: function getId(d: { id: any; }) {
-            return d.id;
-          },
-          getHeight: function getHeight() {
-            return 16;
-          },
-          getWidth: function getWidth() {
-            return 16;
-          },
-          getVGap: function getVGap() {
-            return 2;
-          },
-          getHGap: function getHGap() {
-            return 60;
-          },
+        getVGap: function getVGap() {
+          return 2;
         },
-      });
+        getHGap: function getHGap() {
+          return 60;
+        },
+      },
+    });
 
-      graph.node(function (node) {
-        const { collapsed, style: { stroke } = {} } = node
-        return {
-          labelCfg: {
-            offset: 5,
-            position: node.children && node.children.length > 0 ? 'left' : 'right',
-            style: {
-              fill: theme('#000', isDark)
-            }
-          },
+    graph.node(function (node) {
+      const { collapsed, style: { stroke } = {} } = node;
+      return {
+        labelCfg: {
+          offset: 5,
+          position:
+            node.children && node.children.length > 0 ? "left" : "right",
           style: {
-            fill: collapsed ? theme('#d0d0d0', isDark) : 'transparent',
-          }
-        };
-      });
+            fill: theme("#000", isDark),
+          },
+        },
+        style: {
+          fill: collapsed ? theme("#d0d0d0", isDark) : "transparent",
+        },
+      };
+    });
 
-      graph.data(data);
-      graph.render();
-      graph.fitView([40, 40, 40, 40]);
+    setGraph(graph);
 
-      graphRef.current = graph;
+    return () => {
+      graph.destroy();
+      setGraph(null);
+    };
+  }, [isDark]);
 
-      return () => {
-        graph.destroy();
-        graphRef.current = null;
-      }
-    }
-  }, []);
+  useEffect(() => {
+    if (!graph) return;
+    graph.data(data);
+    graph.render();
+    graph.fitView([40, 40, 40, 40]);
+  }, [data, graph]);
 
   // 响应式调整 graph 的 size
   // useEffect(() => {
@@ -125,5 +138,11 @@ export const ReactG6Tree = (props: {
   //   };
   // }, [ref.current, graphRef.current]);
 
-  return <div ref={ref} className={'resize-canvas ' + className} {...restDomAttributes}></div>;
+  return (
+    <div
+      ref={ref}
+      className={"resize-canvas " + className}
+      {...restDomAttributes}
+    ></div>
+  );
 };

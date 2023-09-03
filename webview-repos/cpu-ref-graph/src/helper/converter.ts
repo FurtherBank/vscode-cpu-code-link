@@ -99,6 +99,7 @@ export const convertTreeData = (
         ...getModuleTypeStyle(data, isDark, config),
       },
       collapsed: treeDataChildren?.length > 0 && depth >= 3,
+      originalData: data,
     };
     return treeData;
   } catch (error) {

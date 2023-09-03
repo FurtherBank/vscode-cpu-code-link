@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { VscodeManager } from "./vscode/vscodeManager";
+import { VscodeManager } from "./bridge/vscodeManager";
 import RefGraphPage from "./pages/refGraph";
+import { App } from "antd";
 
-export const App = () => {
+export const RefGraphApp = () => {
   const [state, setState] = useState<any>({});
   const { data } = state;
 
@@ -37,5 +38,7 @@ export const App = () => {
   }
   const { refGraph, isDark } = data;
 
-  return <RefGraphPage data={refGraph} isDark={isDark} />;
+  return (<App>
+  <RefGraphPage data={refGraph} isDark={isDark} />
+</App>)
 };

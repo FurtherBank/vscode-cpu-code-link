@@ -1,8 +1,8 @@
-import { App } from "./App";
-import { VscodeManager } from "./vscode/vscodeManager";
+import { RefGraphApp } from "./App";
+import { VscodeManager } from "./bridge/vscodeManager";
 import { createRoot } from "react-dom/client";
 
-await VscodeManager.init(async () => {
+VscodeManager.init(async () => {
   const mockRefGraphData = await fetch(
     "https://raw.githubusercontent.com/FurtherBank/vscode-cpu-code-link/main/webview-repos/cpu-ref-graph/src/mockData/callGraph.json?raw=true"
   )
@@ -17,8 +17,8 @@ await VscodeManager.init(async () => {
       isDark: true,
     },
   });
+}).then(() => {
+  const container = document.getElementById("root");
+  const root = createRoot(container);
+  root.render(<RefGraphApp />);
 });
-
-const container = document.getElementById("root");
-const root = createRoot(container);
-root.render(<App />);
