@@ -62,7 +62,7 @@
     "test": "node ./out/test/runTest.js",
     "build": "pnpm run build:webview && pnpm run esbuild-base",
     "build:webview": "cd ./webview-repos/cpu-ref-graph && pnpm run build",
-    "esbuild-base": "esbuild ./src/extension.ts --bundle --outfile=out/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "esbuild-base": "ts-node ./scripts/esbuild.ts",
     "esbuild": "yarn esbuild-base --sourcemap",
     "esbuild-watch": "yarn esbuild-base --sourcemap --watch",
     "publish": "pnpm vsce publish --no-dependencies"

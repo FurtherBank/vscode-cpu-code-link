@@ -41,11 +41,13 @@ export const RefGraphViewer = (
     });
     const realFilePath = document.uri.fsPath;
     console.log('[main] 已经打开代码文件', tsConfigFilePath, realFilePath);
+    console.time('analyzeCallGraph');
     const sourceFile = project.getSourceFileOrThrow(realFilePath);
+    const analyzedFiles = new Set<string>();
     const refGraph: CallGraphNode = {
       importPath: path.basename(realFilePath, path.extname(realFilePath)),
       realFilePath,
-      children: analyzeCallGraph(sourceFile) as CallGraphNode[], 
+      children: analyzeCallGraph(sourceFile, analyzedFiles) as CallGraphNode[], 
     }
     const message = {
       msgType: 'init',
@@ -54,14 +56,16 @@ export const RefGraphViewer = (
         isDark: vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark,
       },
     };
+    console.timeEnd('analyzeCallGraph');
+    console.log(`[main] ${analyzedFiles.size} 文件分析完毕`, message);
+    
     webviewPanel.webview.postMessage(message);
-    console.log('已经post', message);
   }, 500);
 
   return {
     webview,
     onDocumentChange: (e: vscode.TextDocumentChangeEvent) => {
-      updateWebview(e.document);
+      // updateWebview(e.document);
     },
     onEditorActivate: async (document, webviewPanel, _token) => {
       updateWebview(document);

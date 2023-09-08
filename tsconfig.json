@@ -16,7 +16,8 @@
 	},
 	"exclude": [
 		"webview-repos/**",
-		"packages/**"
+		"packages/**",
+		"scripts/**",
 	],
 	
 }
