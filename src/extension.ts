@@ -112,6 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
     // 3. 激活事件中，将 registration 加入到 context.subscriptions
     context.subscriptions.push(registration);
   });
+
 }
 
 // this method is called when your extension is deactivated

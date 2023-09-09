@@ -54,6 +54,11 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run build",
+    "start": "pnpm run start-all",
+    "start-all": "npm-run-all --parallel start-common start-ts-toolkit start-webview",
+    "start-common": "cd ./packages/common && npm run dev",
+    "start-ts-toolkit": "cd ./packages/ts-project-toolkit && npm run dev",
+    "start-webview": "cd ./webview-repos/cpu-ref-graph && npm run dev",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
@@ -81,6 +86,7 @@
     "esbuild": "^0.17.11",
     "eslint": "^8.20.0",
     "glob": "^8.0.3",
+    "jsonc-parser": "^3.2.0",
     "mocha": "^10.0.0",
     "npm-run-all": "^4.1.5",
     "typescript": "^4.7.4"

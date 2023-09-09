@@ -7,6 +7,7 @@
   "types": "dist/src/index.d.ts",
   "scripts": {
     "start": "tsc -w",
+    "dev": "tsc -w",
     "build": "tsc -p .",
     "test": "mocha --require ts-node/register src/**/*.test.ts",
     "generate-barrels": "barrelsby  -c ./barrel.json --delete",

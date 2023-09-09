@@ -97,10 +97,11 @@ export const ReactG6Tree = (props: {
       return {
         labelCfg: {
           offset: 5,
-          position:
-            node.children && node.children.length > 0 ? "left" : "right",
+          position: "left", //node.children && node.children.length > 0 ? "left" : "right",
           style: {
             fill: theme("#000", isDark),
+            stroke: theme("#e2e2e2", isDark), // border color
+            lineWidth: 2, // border width
           },
         },
         style: {

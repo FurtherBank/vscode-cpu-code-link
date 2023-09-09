@@ -1,11 +1,8 @@
 import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
 import { ITextEditorWebview } from '../../core/helper/editor/text/ITextEditor';
 import debounce from 'lodash/debounce';
-import { Project } from 'ts-morph';
 import { findTsConfig } from './findTsConfig';
-import { CallGraphNode, analyzeCallGraph } from 'ts-project-toolkit';
+import { CpuProjectManager } from 'ts-project-toolkit';
 
 export const RefGraphViewer = (
   document: vscode.TextDocument,
@@ -35,20 +32,14 @@ export const RefGraphViewer = (
     if (!workspaceFolder) {
       return;
     }
-    const tsConfigFilePath = await findTsConfig(document.uri.fsPath);
-    const project = new Project({
-      tsConfigFilePath,
-    });
     const realFilePath = document.uri.fsPath;
+    const tsConfigFilePath = await findTsConfig(realFilePath);
+    console.time('openProject');
+    const project = await CpuProjectManager.getProject(tsConfigFilePath);
     console.log('[main] 已经打开代码文件', tsConfigFilePath, realFilePath);
+    console.timeEnd('openProject');
     console.time('analyzeCallGraph');
-    const sourceFile = project.getSourceFileOrThrow(realFilePath);
-    const analyzedFiles = new Set<string>();
-    const refGraph: CallGraphNode = {
-      importPath: path.basename(realFilePath, path.extname(realFilePath)),
-      realFilePath,
-      children: analyzeCallGraph(sourceFile, analyzedFiles) as CallGraphNode[], 
-    }
+    const refGraph = project.getRefGraph(realFilePath);
     const message = {
       msgType: 'init',
       data: {
@@ -57,10 +48,9 @@ export const RefGraphViewer = (
       },
     };
     console.timeEnd('analyzeCallGraph');
-    console.log(`[main] ${analyzedFiles.size} 文件分析完毕`, message);
     
     webviewPanel.webview.postMessage(message);
-  }, 500);
+  }, 500, { leading: true });
 
   return {
     webview,

@@ -7,3 +7,5 @@ export * from "./analyzeExports";
 export * from "./analyzeImports";
 export * from "./utils/exportTest";
 export * from "./utils/promise";
+export * from "./project/CpuProject";
+export * from "./project/CpuProjectManager";

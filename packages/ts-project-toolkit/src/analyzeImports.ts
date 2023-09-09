@@ -1,3 +1,4 @@
+import path from 'path';
 import { SourceFile } from 'ts-morph';
 
 export interface ImportInfo {
@@ -11,10 +12,10 @@ export interface ImportInfo {
 export function analyzeImports(sourceFile: SourceFile): ImportInfo[] {
   const importModules = sourceFile.getImportDeclarations();
   return importModules.map((importDecl) => {
-    const realFilePath = importDecl.getModuleSpecifierSourceFile()?.getFilePath();
+    const importFilePath = importDecl.getModuleSpecifierSourceFile()?.getFilePath();
     return {
       importPath: importDecl.getModuleSpecifierValue(),
-      realFilePath,
+      realFilePath: importFilePath ? path.resolve(importFilePath) : undefined,
       defaultName: importDecl.getDefaultImport()?.getText(),
       namespaceName: importDecl.getNamespaceImport()?.getText(),
       namedImports: importDecl.getNamedImports().map((i) => i.getText()),
