@@ -86,6 +86,7 @@ importers:
       '@ant-design/icons': ^5.2.5
       '@ant-design/pro-components': ^2.6.16
       '@antv/g6': ^4.8.21
+      '@antv/graphin': ^2.7.26
       '@babel/runtime': ^7.22.15
       '@types/color': ^3.0.3
       '@types/lodash': ^4.14.197
@@ -101,6 +102,7 @@ importers:
       lodash: ^4.17.21
       react: ^18.2.0
       react-dom: ^18.2.0
+      terser: ^5.19.4
       ts-project-toolkit: workspace:^1.0.2
       typescript: ^5.0.2
       vite: ^4.4.5
@@ -109,6 +111,7 @@ importers:
       '@ant-design/icons': 5.2.5_biqbaboplfbrettd7655fr4n2y
       '@ant-design/pro-components': 2.6.16_fgk7k3hfosipvaa444kc5svhxy
       '@antv/g6': 4.8.21
+      '@antv/graphin': 2.7.26_biqbaboplfbrettd7655fr4n2y
       '@babel/runtime': 7.22.15
       antd: 5.8.4_biqbaboplfbrettd7655fr4n2y
       color: 4.2.3
@@ -127,8 +130,9 @@ importers:
       eslint: 8.48.0
       eslint-plugin-react-hooks: 4.6.0_eslint@8.48.0
       eslint-plugin-react-refresh: 0.4.3_eslint@8.48.0
+      terser: 5.19.4
       typescript: 5.2.2
-      vite: 4.4.9
+      vite: 4.4.9_terser@5.19.4
 
   webview-repos/ref-graph:
     specifiers:
@@ -752,6 +756,19 @@ packages:
     resolution: {integrity: sha512-0MQT9cU3bKTpFTzcZsR2tQAsDy/FGIzQwCiSR9BhVkDgtwg6bs176ZdWia+/QflWOAg5tQ/C82wnqBXAzpGZnQ==}
     dependencies:
       '@antv/g6-pc': 0.8.21
+    dev: false
+
+  /@antv/graphin/2.7.26_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-5TBqvkOc+u4gl4BSbW/rmYXhmOG8Qyb8z+vmnYEmVkaiROFBrla8i+Ys5fX5Z+Bg4SUwstnCYpUuZDYm/+hUAQ==}
+    peerDependencies:
+      react: '>=16.9.0'
+      react-dom: '>=16.9.0'
+    dependencies:
+      '@antv/g6': 4.8.21
+      d3-quadtree: 3.0.1
+      lodash-es: 4.17.21
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /@antv/graphlib/1.2.0:
@@ -3767,7 +3784,6 @@ packages:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.3
       '@jridgewell/trace-mapping': 0.3.19
-    dev: false
 
   /@jridgewell/sourcemap-codec/1.4.15:
     resolution: {integrity: sha512-eF2rxCRulEKXHTRiDrDy6erMYWqNw4LPdQ8UQA4huuxaQsVeRPFl2oM8oDGxMFhJUWZf9McpLtJasDDZb/Bpeg==}
@@ -5913,7 +5929,7 @@ packages:
       '@babel/plugin-transform-react-jsx-self': 7.22.5_@babel+core@7.22.11
       '@babel/plugin-transform-react-jsx-source': 7.22.5_@babel+core@7.22.11
       react-refresh: 0.14.0
-      vite: 4.4.9
+      vite: 4.4.9_terser@5.19.4
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -7111,7 +7127,6 @@ packages:
 
   /buffer-from/1.1.2:
     resolution: {integrity: sha512-E+XQCRwSbaaiChtv6k6Dwgc+bx+Bs6vuKJHHl5kox/BaKbhiXzqQOwK4cO22yElGp2OCmjwVhT3HmxgyPGnJfQ==}
-    dev: false
 
   /buffer-indexof-polyfill/1.0.2:
     resolution: {integrity: sha512-I7wzHwA3t1/lwXQh+A5PbNvJxgfo5r3xulgpYDB5zckTu/Z9oUK9biouBKQUjEqzaz3HnAT6TYoovmE+GqSf7A==}
@@ -7462,7 +7477,6 @@ packages:
 
   /commander/2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
-    dev: false
 
   /commander/4.1.1:
     resolution: {integrity: sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==}
@@ -8004,6 +8018,11 @@ packages:
 
   /d3-quadtree/2.0.0:
     resolution: {integrity: sha512-b0Ed2t1UUalJpc3qXzKi+cPGxeXRr4KU9YSlocN74aTzp6R/Ud43t79yLLqxHRWZfsvWXmbDWPpoENK1K539xw==}
+    dev: false
+
+  /d3-quadtree/3.0.1:
+    resolution: {integrity: sha512-04xDrxQTDTCFwP5H6hRhsRcb9xxv2RzkcsygFzmkSIOJy3PeRJP7sNk3VRIbKXcog561P9oU0/rVH6vDROAgUw==}
+    engines: {node: '>=12'}
     dev: false
 
   /d3-timer/1.0.10:
@@ -11868,6 +11887,10 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       p-locate: 5.0.0
+
+  /lodash-es/4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
+    dev: false
 
   /lodash.camelcase/4.3.0:
     resolution: {integrity: sha512-TwuEnCnxbc3rAvhf/LbG7tJUDzhqXyFnv3dtzLOPgCG/hODL7WFnsbwktkD7yUV0RrreP/l1PALq/YSg6VvjlA==}
@@ -16371,7 +16394,6 @@ packages:
     dependencies:
       buffer-from: 1.1.2
       source-map: 0.6.1
-    dev: false
 
   /source-map/0.5.7:
     resolution: {integrity: sha512-LbrmJOMUSdEVxIKvdcJzQC+nQhe8FUZQTXQy6+I75skNgn3OoQ0DZA8YnFa7gp8tqtL3KPf1kmo0R5DoApeSGQ==}
@@ -16986,6 +17008,17 @@ packages:
       commander: 2.20.3
       source-map-support: 0.5.21
     dev: false
+
+  /terser/5.19.4:
+    resolution: {integrity: sha512-6p1DjHeuluwxDXcuT9VR8p64klWJKo1ILiy19s6C9+0Bh2+NWTX6nD9EPppiER4ICkHDVB1RkVpin/YW2nQn/g==}
+    engines: {node: '>=10'}
+    hasBin: true
+    dependencies:
+      '@jridgewell/source-map': 0.3.5
+      acorn: 8.10.0
+      commander: 2.20.3
+      source-map-support: 0.5.21
+    dev: true
 
   /test-exclude/6.0.0:
     resolution: {integrity: sha512-cAGWPIyOHU6zlmg88jwm7VRyXnMN7iV68OGAbYDk/Mh/xC/pzVPlQtY6ngoIH/5/tciuhGfvESU8GrHrcxD56w==}
@@ -17686,7 +17719,7 @@ packages:
       fsevents: 2.3.2
     dev: false
 
-  /vite/4.4.9:
+  /vite/4.4.9_terser@5.19.4:
     resolution: {integrity: sha512-2mbUn2LlUmNASWwSCNSJ/EG2HuSRTnVNaydp6vMCm5VIqJsjMfbIWtbH2kDuwUVW5mMUKKZvGPX/rqeqVvv1XA==}
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
@@ -17717,6 +17750,7 @@ packages:
       esbuild: 0.18.20
       postcss: 8.4.28
       rollup: 3.28.1
+      terser: 5.19.4
     optionalDependencies:
       fsevents: 2.3.2
     dev: true

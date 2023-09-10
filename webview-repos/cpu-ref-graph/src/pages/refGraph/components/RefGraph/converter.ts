@@ -6,7 +6,7 @@ import {
 import { calculateNodeSize } from "../../../../helper/compute";
 import { theme } from "../../../../helper/theme";
 import uniqueId from "lodash/uniqueId";
-import { type } from "os";
+import { GlobalToken } from "antd/lib";
 
 export interface ConvertConfig {
   ignore?: {
@@ -16,6 +16,11 @@ export interface ConvertConfig {
     jsx?: boolean;
     js?: boolean;
   };
+}
+
+export interface ConvertedTreeData extends TreeGraphData {
+  originalData: CallGraphNode;
+  moduleType: ModuleType;
 }
 
 const getModuleType = (data: CallGraphNode): ModuleType => {
@@ -41,24 +46,24 @@ const getModuleType = (data: CallGraphNode): ModuleType => {
 export type ModuleType = "external" | "hook" | "class" | "jsx" | "js";
 
 const getModuleTypeStyle = (
-  isDark: boolean,
+  token: GlobalToken,
   type: ModuleType,
 ) => {
   const moduleTypeStyleMap = {
     jsx: {
-      stroke: theme("#4080ff", isDark),
+      stroke: token.blue6,
     },
     js: {
-      stroke: theme("#d0d080", isDark),
+      stroke: token.yellow6,
     },
     class: {
-      stroke: theme("#b0ff80", isDark),
+      stroke: token.green6,
     },
     hook: {
-      stroke: theme("#ffb080", isDark),
+      stroke: token.orange6,
     },
     external: {
-      stroke: theme("#e2e2e2", isDark),
+      stroke: token.colorTextDisabled,
     },
   };
 
@@ -82,11 +87,11 @@ const getModuleTypeStyle = (
  * @returns 
  */
 export const convertTreeData = (
+  token: GlobalToken,
   data: CallGraphNode,
-  isDark = false,
   config: ConvertConfig = {},
   pointer = []
-): TreeGraphData | null => {
+): ConvertedTreeData | null => {
   try {
     const {
       importPath,
@@ -112,19 +117,19 @@ export const convertTreeData = (
     // 计算子节点
     const treeDataChildren = children
       ?.map((child: CallGraphNode) =>
-        convertTreeData(child, isDark, config, filePointer)
+        convertTreeData(token, child, config, filePointer)
       )
       .filter(Boolean);
     
     // 计算节点属性
-    const treeData: TreeGraphData = {
+    const treeData = {
       id: uniqueId(),
       label,
       // description,
       children: treeDataChildren,
       style: {
         lineWidth: calculateNodeSize(size),
-        ...getModuleTypeStyle(isDark, moduleType),
+        ...getModuleTypeStyle(token, moduleType),
       },
       moduleType,
       collapsed: treeDataChildren?.length > 0 && depth >= 3,

@@ -14,7 +14,7 @@ VscodeManager.init(async () => {
   VscodeManager.vscode.setState({
     data: {
       refGraph: mockRefGraphData,
-      isDark: true,
+      isDark: Math.random() > 0.5,
     },
   });
 }).then(() => {

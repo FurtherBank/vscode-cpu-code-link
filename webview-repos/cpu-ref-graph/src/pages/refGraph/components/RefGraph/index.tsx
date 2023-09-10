@@ -1,6 +1,12 @@
-import { useMemo } from "react";
-import { ReactG6Tree } from "../../../../components/base/ReactG6Tree";
-import { ConvertConfig, convertTreeData } from "./converter";
+import { useCallback, useMemo, useState } from "react";
+import { CpuCodeRefGraph } from "../CpuCodeRefGraph";
+import { ConvertConfig, ConvertedTreeData, convertTreeData } from "./converter";
+import { theme } from "antd/lib";
+import { GraphItemInfo } from "../GraphItemInfo";
+import HoverToolTip from "../../../../components/base/HoverToolTip";
+import { IG6GraphEvent } from "@antv/g6";
+
+const { useToken } = theme;
 
 interface RelationGraphProps {
   data: any;
@@ -28,18 +34,45 @@ const staticOptions = {
 export const RefGraph = (props: RelationGraphProps) => {
   const { data, isDark, config } = props;
 
+  const { token } = useToken();
+
   const convertedData = useMemo(() => {
-    return convertTreeData(data, isDark, config);
+    return convertTreeData(token, data, config);
   }, [data, config, isDark]);
 
+  const [hoverTipVisible, setHoverTipVisible] = useState(false);
+  const [nodeOnHover, setNodeOnHover] = useState<ConvertedTreeData>(null);
+
+  const handleItemMouseEnter = useCallback(
+    (e: IG6GraphEvent, item: ConvertedTreeData) => {
+      setHoverTipVisible(true);
+      setNodeOnHover(item);
+    },
+    []
+  );
+
+  const handleItemMouseLeave = useCallback(
+    (e: IG6GraphEvent, item: ConvertedTreeData) => {
+      setHoverTipVisible(false);
+    },
+    []
+  );
+
   return (
-    <div style={{ flex: 1, overflow: "hidden" }}>
-      <ReactG6Tree
-        data={convertedData}
-        options={staticOptions}
-        domAttributes={{ style: { width: "100%", height: "100%" } }}
-        isDark={isDark}
-      />
-    </div>
+    <>
+      <div style={{ flex: 1, overflow: "hidden" }}>
+        <CpuCodeRefGraph
+          data={convertedData}
+          options={staticOptions}
+          domAttributes={{ style: { width: "100%", height: "100%" } }}
+          isDark={isDark}
+          itemMouseEnter={handleItemMouseEnter}
+          itemMouseLeave={handleItemMouseLeave}
+        />
+      </div>
+      <HoverToolTip visible={hoverTipVisible}>
+        <GraphItemInfo data={nodeOnHover} />
+      </HoverToolTip>
+    </>
   );
 };

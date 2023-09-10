@@ -1,9 +1,7 @@
-import { PageHeader } from "@ant-design/pro-components";
-import { Button, Checkbox, Dropdown, Menu } from "antd";
 import { RefGraph } from "./components/RefGraph";
 import { CallGraphNode } from "ts-project-toolkit";
 import { useMemo, useState } from "react";
-import { Select } from "antd/lib";
+import { Select, theme } from "antd/lib";
 
 export interface RefGraphPageProps {
   data: CallGraphNode;
@@ -36,25 +34,28 @@ export const RefGraphPage = (props: RefGraphPageProps) => {
   }, [selectedModules]);
 
   return (
-    <div style={{ height: "100vh", display: 'flex', flexDirection: 'column' }}>
-      <PageHeader
-        title="Ref Graph"
-        extra={
-          <>
-            <span style={{ marginRight: 10 }}>不显示:</span>
-            <Select
-              mode="multiple"
-              value={selectedModules}
-              onChange={(value) => setSelectedModules(value as ModuleType[])}
-              options={options}
-              style={{ minWidth: 150 }}
-            />
-          </>
-        }
-      />
-      <RefGraph data={data} isDark={isDark} config={config}/>
+    <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <h3>引用关系图</h3>
+        <div>
+          <span style={{ marginRight: 10 }}>不显示:</span>
+          <Select
+            mode="multiple"
+            value={selectedModules}
+            onChange={(value) => setSelectedModules(value as ModuleType[])}
+            options={options}
+            style={{ minWidth: 150 }}
+          />
+        </div>
+      </div>
+      <RefGraph data={data} isDark={isDark} config={config} />
     </div>
   );
 };
 
-export default RefGraphPage;

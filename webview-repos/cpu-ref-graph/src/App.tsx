@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { VscodeManager } from "./bridge/vscodeManager";
-import RefGraphPage from "./pages/refGraph";
+import { RefGraphPage } from "./pages/refGraph";
 import App from "antd/lib/app";
 import ConfigProvider from "antd/lib/config-provider";
 import theme from "antd/lib/theme";
-import 'antd/dist/reset.css'
+import "antd/dist/reset.css";
 
 export const RefGraphApp = () => {
   const [state, setState] = useState<any>({});
@@ -36,15 +36,26 @@ export const RefGraphApp = () => {
     window.addEventListener("message", listener);
   }, []);
 
+  const { refGraph, isDark } = data ?? {};
+
+  const antdTheme = useMemo(() => {
+    return isDark
+      ? {
+          algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
+          // token: { colorPrimary: "#000000" },
+        }
+      : {
+          algorithm: [theme.compactAlgorithm],
+          // token: { colorPrimary: "#ffffff" },
+        };
+  }, [isDark]);
+
   if (!data) {
     return null;
   }
-  const { refGraph, isDark } = data;
 
   return (
-    <ConfigProvider
-      theme={{ algorithm: [theme.darkAlgorithm, theme.compactAlgorithm] }}
-    >
+    <ConfigProvider theme={antdTheme}>
       <App>
         <RefGraphPage data={refGraph} isDark={isDark} />
       </App>

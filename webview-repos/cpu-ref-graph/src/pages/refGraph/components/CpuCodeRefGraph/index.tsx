@@ -5,20 +5,31 @@ import {
   GraphData,
   GraphOptions,
   TreeGraphData,
+  IG6GraphEvent,
 } from "@antv/g6";
 import "./resize-canvas.css";
-import { theme } from "../../helper/theme";
+import { theme } from "../../../../helper/theme";
+import { ConvertedTreeData } from "../RefGraph/converter";
 
-export const ReactG6Tree = (props: {
-  data: GraphData | TreeGraphData | undefined;
+export const CpuCodeRefGraph = (props: {
+  data: ConvertedTreeData | undefined;
   options: Omit<GraphOptions, "container">;
   domAttributes?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >;
   isDark?: boolean;
+  itemMouseEnter?: (e: IG6GraphEvent, item: any) => void;
+  itemMouseLeave?: (e: IG6GraphEvent, item: any) => void;
 }) => {
-  const { data, options, domAttributes = {}, isDark } = props;
+  const {
+    data,
+    options,
+    domAttributes = {},
+    isDark,
+    itemMouseEnter,
+    itemMouseLeave,
+  } = props;
   const { className = "", ...restDomAttributes } = domAttributes;
   const ref = useRef<HTMLDivElement>(null);
   const [graph, setGraph] = React.useState<Graph | null>(null);
@@ -52,13 +63,6 @@ export const ReactG6Tree = (props: {
           },
           "drag-canvas",
           "zoom-canvas",
-          {
-            type: "tooltip",
-            formatText(model) {
-              return model.label as string;
-            },
-            offset: 10,
-          },
         ],
       },
       defaultNode: {
@@ -117,6 +121,24 @@ export const ReactG6Tree = (props: {
       setGraph(null);
     };
   }, [isDark]);
+
+  useEffect(() => {
+    if (!graph) return;
+    
+    console.log("mouse event");
+    graph.on("node:mouseenter", (e) => {
+      const { item } = e;
+      const itemData = item.getModel() as ConvertedTreeData;
+      if (itemMouseEnter) itemMouseEnter(e, itemData);
+    });
+
+    graph.on("node:mouseleave", (e) => {
+      const { item } = e;
+      const itemData = item.getModel() as ConvertedTreeData;
+      console.log("handleItemMouseLeave", item);
+      if (itemMouseLeave) itemMouseLeave(e, itemData);
+    });
+  }, [graph, itemMouseEnter, itemMouseLeave]);
 
   useEffect(() => {
     if (!graph) return;
