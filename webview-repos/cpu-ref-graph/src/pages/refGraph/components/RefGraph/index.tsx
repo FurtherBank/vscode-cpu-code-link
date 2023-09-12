@@ -5,6 +5,9 @@ import { theme } from "antd/lib";
 import { GraphItemInfo } from "../GraphItemInfo";
 import HoverToolTip from "../../../../components/base/HoverToolTip";
 import { IG6GraphEvent } from "@antv/g6";
+import { ItemType, MenuItemType } from "antd/lib/menu/hooks/useItems";
+import { GraphItemContextMenu } from "../GraphItemContextMenu";
+import { bridge } from "../../../../bridge";
 
 const { useToken } = theme;
 
@@ -13,23 +16,6 @@ interface RelationGraphProps {
   isDark: boolean;
   config?: ConvertConfig;
 }
-
-const staticOptions = {
-  layout: {
-    type: "force",
-    preventOverlap: true,
-    nodeSize: 50,
-    linkDistance: 100,
-    nodeStrength: -30,
-    edgeStrength: 0.1,
-  },
-  defaultNode: {
-    size: 40,
-  },
-  modes: {
-    default: ["drag-canvas", "zoom-canvas"],
-  },
-};
 
 export const RefGraph = (props: RelationGraphProps) => {
   const { data, isDark, config } = props;
@@ -58,21 +44,57 @@ export const RefGraph = (props: RelationGraphProps) => {
     []
   );
 
+  const [contextMenuVisible, setContextMenuVisible] = useState(false);
+  const [contextMenuPos, setContextMenuPos] = useState({ x: 0, y: 0 });
+  const [contextMenuItems, setContextMenuItems] = useState<
+    ItemType<MenuItemType>[]
+  >([]);
+  const handleItemContextMenu = useCallback(
+    (e: IG6GraphEvent, item: ConvertedTreeData) => {
+      const position = { x: e.clientX, y: e.clientY };
+      setContextMenuPos(position);
+      setContextMenuVisible(true);
+      const items = [];
+      if (item.moduleType !== "external") {
+        items.push({
+          key: "openInEditor",
+          label: "在编辑器中打开",
+          onClick: () => {
+            bridge.post("open", { path: item.originalData.realFilePath });
+          },
+        });
+      }
+      setContextMenuItems(items);
+
+      e.preventDefault();
+    },
+    []
+  );
+
   return (
     <>
       <div style={{ flex: 1, overflow: "hidden" }}>
         <CpuCodeRefGraph
           data={convertedData}
-          options={staticOptions}
           domAttributes={{ style: { width: "100%", height: "100%" } }}
           isDark={isDark}
           itemMouseEnter={handleItemMouseEnter}
           itemMouseLeave={handleItemMouseLeave}
+          itemContextMenu={handleItemContextMenu}
         />
       </div>
-      <HoverToolTip visible={hoverTipVisible}>
+      <HoverToolTip
+        visible={hoverTipVisible && !contextMenuVisible}
+        offset={{ x: 8, y: 8 }}
+      >
         <GraphItemInfo data={nodeOnHover} />
       </HoverToolTip>
+      <GraphItemContextMenu
+        visible={contextMenuVisible}
+        setVisible={setContextMenuVisible}
+        position={contextMenuPos}
+        items={contextMenuItems}
+      />
     </>
   );
 };

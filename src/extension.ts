@@ -1,14 +1,15 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-import * as vscode from 'vscode';
-import { pluginName } from './constrants/project';
-import Command from './core/command/command';
-import { WebviewManager } from './core/webview/manager';
-import { loadWebviewHtml } from './core/helper/webview/loadWebviewHtml';
-import { getWebviewPathInfo } from './core/helper/webview/getWebviewPathInfo';
-import { ITextEditor } from './core/helper/editor/text/ITextEditor';
-import { RefGraphViewer } from './webview/ref-graph-viewer';
-import { Start } from './commands/start';
+import * as vscode from "vscode";
+import { pluginName } from "./constrants/project";
+import Command from "./core/command/command";
+import { WebviewManager } from "./core/webview/manager";
+import { loadWebviewHtml } from "./core/helper/webview/loadWebviewHtml";
+import { getWebviewPathInfo } from "./core/helper/webview/getWebviewPathInfo";
+import { ITextEditor } from "./core/helper/editor/text/ITextEditor";
+import { RefGraphViewer } from "./webview/ref-graph-viewer";
+import { Start } from "./commands/start";
+import { CpuBridge } from "vscode-cpu-common";
 
 // just fill this array by your commands, then will automatically register
 // note: don't forget to fill the command in package.json
@@ -50,39 +51,37 @@ export function activate(context: vscode.ExtensionContext) {
         webviewPanel: vscode.WebviewPanel,
         _token: vscode.CancellationToken
       ): Promise<void> {
+        // 通过 bridge 进行双边通信
+        const bridge = new CpuBridge(webviewPanel.webview, (listener) => {
+          return webviewPanel.webview.onDidReceiveMessage(listener).dispose;
+        });
         const {
           webview,
           onDocumentChange = (e) => {
             if (e.document.uri.toString() === document.uri.toString()) {
-              webviewPanel.webview.postMessage({
-                type: 'update',
-                text: document.getText(),
-              });
+              bridge.post("update", document.getText());
             }
           },
           onEditorActivate,
-        } = await getWebview(document, webviewPanel, _token);
-        const { onDidReceiveMessage, panelListeners, htmlPath, getPanelOptions } = webview;
+        } = await getWebview(bridge, document, webviewPanel, _token);
+        const { panelListeners, htmlPath, getPanelOptions } = webview;
 
         // 1. 应用 webview options
         const pathInfo = getWebviewPathInfo(extensionPath, htmlPath);
 
-        const panelOptions: vscode.WebviewPanelOptions & vscode.WebviewOptions = {
-          localResourceRoots: [vscode.Uri.file(pathInfo.rootString)],
-          ...getPanelOptions(extensionPath),
-        };
+        const panelOptions: vscode.WebviewPanelOptions & vscode.WebviewOptions =
+          {
+            localResourceRoots: [vscode.Uri.file(pathInfo.rootString)],
+            ...getPanelOptions(extensionPath),
+          };
 
         webviewPanel.webview.options = panelOptions;
 
         loadWebviewHtml(webviewPanel, pathInfo);
 
-        // 消息通信，自己负责消息的具体解析和处理
-        if (onDidReceiveMessage) {
-          webviewPanel.webview.onDidReceiveMessage(onDidReceiveMessage, document);
-        }
-
         // 2. 挂载 TextDocument Listener
-        const changeDocumentSubscription = vscode.workspace.onDidChangeTextDocument(onDocumentChange);
+        const changeDocumentSubscription =
+          vscode.workspace.onDidChangeTextDocument(onDocumentChange);
 
         // 挂载 webviewPanel 的监听器
         const { onDidDispose, ...restListeners } = panelListeners ?? {};
@@ -95,7 +94,9 @@ export function activate(context: vscode.ExtensionContext) {
         });
 
         // 其它：装载并写入 disposables
-        const restListenerKeys = Object.keys(restListeners) as (keyof typeof restListeners)[];
+        const restListenerKeys = Object.keys(
+          restListeners
+        ) as (keyof typeof restListeners)[];
 
         restListenerKeys.forEach((key) => {
           const listener = restListeners[key];
@@ -108,11 +109,13 @@ export function activate(context: vscode.ExtensionContext) {
         }
       },
     };
-    const registration = vscode.window.registerCustomEditorProvider(`${pluginName}.${viewType}`, provider);
+    const registration = vscode.window.registerCustomEditorProvider(
+      `${pluginName}.${viewType}`,
+      provider
+    );
     // 3. 激活事件中，将 registration 加入到 context.subscriptions
     context.subscriptions.push(registration);
   });
-
 }
 
 // this method is called when your extension is deactivated

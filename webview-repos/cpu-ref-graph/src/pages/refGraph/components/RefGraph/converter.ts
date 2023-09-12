@@ -4,7 +4,6 @@ import {
   isInternalCodeModule,
 } from "ts-project-toolkit/src/analyzeCallGraph";
 import { calculateNodeSize } from "../../../../helper/compute";
-import { theme } from "../../../../helper/theme";
 import uniqueId from "lodash/uniqueId";
 import { GlobalToken } from "antd/lib";
 
@@ -45,27 +44,16 @@ const getModuleType = (data: CallGraphNode): ModuleType => {
 
 export type ModuleType = "external" | "hook" | "class" | "jsx" | "js";
 
-const getModuleTypeStyle = (
-  token: GlobalToken,
+export const getModuleTypeStyleToken = (
   type: ModuleType,
-) => {
+): keyof GlobalToken => {
   const moduleTypeStyleMap = {
-    jsx: {
-      stroke: token.blue6,
-    },
-    js: {
-      stroke: token.yellow6,
-    },
-    class: {
-      stroke: token.green6,
-    },
-    hook: {
-      stroke: token.orange6,
-    },
-    external: {
-      stroke: token.colorTextDisabled,
-    },
-  };
+    jsx: 'blue',
+    js: 'yellow',
+    class: 'green',
+    hook: 'orange',
+    external: 'colorTextDisabled',
+  } as const;
 
   // 注意优先级顺序
   if (type === "external") return moduleTypeStyleMap.external;
@@ -128,13 +116,17 @@ export const convertTreeData = (
       // description,
       children: treeDataChildren,
       style: {
+        // stroke: {
+        //   color: token[getModuleTypeStyleToken(moduleType)],
+        //   width: calculateNodeSize(size),
+        // },
+        stroke: token[getModuleTypeStyleToken(moduleType)],
         lineWidth: calculateNodeSize(size),
-        ...getModuleTypeStyle(token, moduleType),
       },
       moduleType,
       collapsed: treeDataChildren?.length > 0 && depth >= 3,
       originalData: data,
-    };
+    } as ConvertedTreeData;
     return treeData;
   } catch (error) {
     console.group("convertTreeData");

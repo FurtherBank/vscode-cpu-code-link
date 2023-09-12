@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 
 import { IWebview } from '../../webview/IWebview';
+import { CpuBridge } from 'vscode-cpu-common';
 
 export interface ITextEditorWebview {
   webview: IWebview
@@ -19,6 +20,7 @@ export interface ITextEditorWebview {
 }
 
 export type ITextEditor = (
+  bridge: CpuBridge,
   document: vscode.TextDocument,
   webviewPanel: vscode.WebviewPanel,
   _token: vscode.CancellationToken

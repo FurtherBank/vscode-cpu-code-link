@@ -1,17 +1,27 @@
-import * as vscode from 'vscode';
-import { ITextEditorWebview } from '../../core/helper/editor/text/ITextEditor';
-import debounce from 'lodash/debounce';
-import { findTsConfig } from './findTsConfig';
-import { CpuProjectManager } from 'ts-project-toolkit';
+import * as vscode from "vscode";
+import { CpuBridge } from "vscode-cpu-common";
+import { ITextEditorWebview } from "../../core/helper/editor/text/ITextEditor";
+import debounce from "lodash/debounce";
+import { findTsConfig } from "./findTsConfig";
+import { CpuProjectManager } from "ts-project-toolkit";
+import { VscodeRequest } from "./bridge/post";
 
 export const RefGraphViewer = (
+  bridge: CpuBridge<VscodeRequest, {}, any>,
   document: vscode.TextDocument,
   webviewPanel: vscode.WebviewPanel,
   _token: vscode.CancellationToken
 ): ITextEditorWebview => {
+  bridge.on("open", (payload) => {
+    const { path } = payload;
+    const fileUri = vscode.Uri.file(path);
+    vscode.window.showTextDocument(fileUri, {
+      viewColumn: vscode.ViewColumn.One,
+    });
+  });
   const webview = {
-    viewType: 'RefGraphViewer',
-    title: 'RefGraphViewer',
+    viewType: "RefGraphViewer",
+    title: "RefGraphViewer",
     getPanelOptions() {
       return {
         // Enable javascript in the webview
@@ -22,35 +32,38 @@ export const RefGraphViewer = (
         // localResourceRoots: [vscode.Uri.file(path.join(extensionPath, 'web-source/dist'))],
       };
     },
-    htmlPath: 'cpu-ref-graph/dist',
-    onDidReceiveMessage: async function () {},
+    htmlPath: "cpu-ref-graph/dist",
+    panelListeners: {
+      onDidDispose: () => {},
+    },
   };
 
-  const updateWebview = debounce(async (document) => {
-    const workspaceFolders = vscode.workspace.workspaceFolders;
-    const workspaceFolder = workspaceFolders?.[0];
-    if (!workspaceFolder) {
-      return;
-    }
-    const realFilePath = document.uri.fsPath;
-    const tsConfigFilePath = await findTsConfig(realFilePath);
-    console.time('openProject');
-    const project = await CpuProjectManager.getProject(tsConfigFilePath);
-    console.log('[main] 已经打开代码文件', tsConfigFilePath, realFilePath);
-    console.timeEnd('openProject');
-    console.time('analyzeCallGraph');
-    const refGraph = project.getRefGraph(realFilePath);
-    const message = {
-      msgType: 'init',
-      data: {
-        refGraph,
-        isDark: vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark,
-      },
-    };
-    console.timeEnd('analyzeCallGraph');
-    
-    webviewPanel.webview.postMessage(message);
-  }, 500, { leading: true });
+  const updateWebview = debounce(
+    async (document) => {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+      const workspaceFolder = workspaceFolders?.[0];
+      if (!workspaceFolder) {
+        return;
+      }
+      const realFilePath = document.uri.fsPath;
+      const tsConfigFilePath = await findTsConfig(realFilePath);
+      console.time("openProject");
+      const project = await CpuProjectManager.getProject(tsConfigFilePath);
+      console.log("[main] 已经打开代码文件", tsConfigFilePath, realFilePath);
+      console.timeEnd("openProject");
+      console.time("analyzeCallGraph");
+      const message = {
+        refGraph: project.getRefGraph(realFilePath),
+        isDark:
+          vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark,
+      };
+      console.timeEnd("analyzeCallGraph");
+
+      bridge.post("init", message);
+    },
+    500,
+    { leading: true }
+  );
 
   return {
     webview,

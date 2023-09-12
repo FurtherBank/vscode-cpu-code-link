@@ -13,22 +13,23 @@ import { ConvertedTreeData } from "../RefGraph/converter";
 
 export const CpuCodeRefGraph = (props: {
   data: ConvertedTreeData | undefined;
-  options: Omit<GraphOptions, "container">;
+  // options: Omit<GraphOptions, "container">;
   domAttributes?: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLDivElement>,
     HTMLDivElement
   >;
   isDark?: boolean;
-  itemMouseEnter?: (e: IG6GraphEvent, item: any) => void;
-  itemMouseLeave?: (e: IG6GraphEvent, item: any) => void;
+  itemMouseEnter?: (e: IG6GraphEvent, item: ConvertedTreeData) => void;
+  itemMouseLeave?: (e: IG6GraphEvent, item: ConvertedTreeData) => void;
+  itemContextMenu?: (e: IG6GraphEvent, item: ConvertedTreeData) => void;
 }) => {
   const {
     data,
-    options,
     domAttributes = {},
     isDark,
     itemMouseEnter,
     itemMouseLeave,
+    itemContextMenu
   } = props;
   const { className = "", ...restDomAttributes } = domAttributes;
   const ref = useRef<HTMLDivElement>(null);
@@ -42,6 +43,7 @@ export const CpuCodeRefGraph = (props: {
       container: ref.current!,
       width: rect.width,
       height: rect.height - 6,
+      animate: false,
       animateCfg: {
         duration: 100, // duration in milliseconds, adjust this to your liking
         // easing: 'easeQuadIn', // easing function, you can choose others as well
@@ -63,6 +65,13 @@ export const CpuCodeRefGraph = (props: {
           },
           "drag-canvas",
           "zoom-canvas",
+          {
+            type: "context-menu",
+            shouldBegin: (e) => {
+              console.log("shouldBegin", e);
+              return true;
+            }
+          }
         ],
       },
       defaultNode: {
@@ -78,7 +87,7 @@ export const CpuCodeRefGraph = (props: {
       layout: {
         type: "compactBox",
         direction: "LR",
-        getId: function getId(d: { id: any }) {
+        getId: function getId(d: { id: ConvertedTreeData }) {
           return d.id;
         },
         getHeight: function getHeight() {
@@ -138,7 +147,13 @@ export const CpuCodeRefGraph = (props: {
       console.log("handleItemMouseLeave", item);
       if (itemMouseLeave) itemMouseLeave(e, itemData);
     });
-  }, [graph, itemMouseEnter, itemMouseLeave]);
+    graph.on("node:contextmenu", (e) => {
+      const { item } = e;
+      const itemData = item.getModel() as ConvertedTreeData;
+      console.log("handleContextMenu", item);
+      if (itemContextMenu) itemContextMenu(e, itemData);
+    });
+  }, [graph, itemMouseEnter, itemMouseLeave, itemContextMenu]);
 
   useEffect(() => {
     if (!graph) return;

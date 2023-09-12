@@ -1,19 +1,42 @@
 import { v4 as uuid } from "uuid";
 
+export type Union<T, U> = {
+  [Key in keyof T | keyof U]: Key extends keyof T & keyof U
+    ? T[Key] | U[Key]
+    : Key extends keyof T
+    ? T[Key] | undefined
+    : Key extends keyof U
+    ? U[Key] | undefined
+    : never;
+};
+
 export interface IPostMessage {
   postMessage: (message: any) => void;
 }
-export interface IEvent {
-  data: any;
+
+export interface CommonRequest<T = any> {
+  requestId: string;
+  action: string;
+  payload: T;
 }
 
-export type Observe = (listener: (event: IEvent) => void) => void;
+export interface CommonResponse<T = any> {
+  responseId: string;
+  action: string;
+  data: T;
+}
 
-export abstract class CpuBridge<
+export type Observe = (
+  listener: (message: CommonRequest | CommonResponse) => void
+) => () => void;
+
+export class CpuBridge<
   /** 自己 post 的 message 类型映射 */
-  MyRequest extends Record<string, any>,
+  MyRequest = Record<string, any>,
   /** 对方返回的 message 类型映射 */
-  AgentResponse extends Record<string, any>
+  AgentResponse = Record<string, any>,
+  /** 对方返回的 message 类型映射 */
+  AgentRequest = Record<string, any>
 > {
   private requestPool: Record<
     string,
@@ -22,7 +45,8 @@ export abstract class CpuBridge<
       reject: (data: any) => void;
     }
   > = {};
-  public listener: (event: IEvent) => void
+  public listener: (message: any) => void;
+  private removeListener: () => void;
 
   /**
    * 通用双方通信抽象类
@@ -33,28 +57,34 @@ export abstract class CpuBridge<
   constructor(
     private agent: IPostMessage,
     observe: Observe,
-    public handlers: { [k: string]: (payload: any) => any },
+    public handlers: { [k: string]: (payload: any) => any } = {}
   ) {
     this.handlers = handlers;
     this.requestPool = {};
 
-    this.listener = (event) => {
-      const { requestId, responseId, action, payload, data } = event.data;
+    this.listener = async (message: CommonRequest | CommonResponse) => {
+      const { requestId, responseId, action, payload, data } = message as Union<
+        CommonRequest,
+        CommonResponse
+      >;
+      // requestId 存在，是对方 post 的请求
       if (requestId !== undefined) {
-        // requestId 不为空是来自 vscode 的请求，此外是 getState 的返回值
+        console.log(`[bridge] receive request ${action}: ${requestId}`);
         const responseData = this.handlers[action]
-          ? this.handlers[action](payload)
+          ? await this.handlers[action](payload)
           : null;
         if (requestId) this.response(requestId, action, responseData);
         return;
       }
+
       if (responseId) {
         // responseId 不为空是来自 vscode 的响应
         const request = this.requestPool[responseId];
         if (request) {
+          console.log(`[bridge] receive response ${action}: ${requestId}`);
           const { resolve } = request;
           resolve(data);
-          delete this.requestPool[requestId];
+          delete this.requestPool[responseId];
         } else {
           console.error(
             `请求 ${responseId} 返回结果但不在请求池中，可能超时，请检查`,
@@ -64,17 +94,19 @@ export abstract class CpuBridge<
         }
         return;
       }
-    }
-    observe(this.listener);
+    };
+    this.removeListener = observe(this.listener);
   }
 
-  public post<T extends keyof MyRequest>(action: T, payload: MyRequest[T]) {
+  public post<T extends keyof MyRequest & string>(action: T, payload: MyRequest[T]) {
     const requestId = uuid();
     this.agent.postMessage({
       action,
       payload,
       requestId,
     });
+    console.log(`[bridge] post ${action}: ${requestId}`);
+    
     const promise = new Promise((resolve, reject) => {
       // 超时处理
       setTimeout(() => {
@@ -97,10 +129,22 @@ export abstract class CpuBridge<
   }
 
   private response(requestId: string, action: string, data: any) {
+    console.log(`[bridge] response ${action}: ${requestId}`);
     this.agent.postMessage({
       responseId: requestId,
       action,
       data,
     });
+  }
+
+  on<T extends keyof AgentRequest & string>(action: T, handler: (payload: AgentRequest[T]) => any) {
+    this.handlers[action] = handler;
+    return () => {
+      delete this.handlers[action];
+    };
+  }
+
+  destroy() {
+    this.removeListener();
   }
 }

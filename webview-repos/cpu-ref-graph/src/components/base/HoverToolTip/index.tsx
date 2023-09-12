@@ -7,10 +7,14 @@ import React, { useState, useEffect, useMemo } from "react";
 interface HoverToolTipProps {
   visible?: boolean;
   children: React.ReactNode;
+  offset?: { x: number; y: number };
 }
 
 const HoverToolTip = (props: HoverToolTipProps) => {
-  const { visible = false, children } = props;
+  const { visible = false, children, offset = {
+    x: 0,
+    y: 0
+  } } = props;
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [rect, setRect] = useState<DOMRect | null>(null);
 
@@ -39,17 +43,18 @@ const HoverToolTip = (props: HoverToolTipProps) => {
     const { x, y } = position;
     const { width, height } = rect;
 
-    const newX = x + width > innerWidth ? x - width : x;
-    const newY = y + height > innerHeight ? y - height : y;
+    const newX = Math.min(x + offset.x, innerWidth - width)
+    const newY = Math.min(y + offset.y, innerHeight - height)
 
     return { x: newX, y: newY };
-  }, [position, rect]);
+  }, [position, rect, offset.x, offset.y]);
 
   return (
     <div
       style={{
         position: "fixed",
-        visibility: visible ? "visible" : "hidden",
+        pointerEvents: "none",
+        display: visible ? "block" : "none",
         left: realPosition.x,
         top: realPosition.y,
       }}
