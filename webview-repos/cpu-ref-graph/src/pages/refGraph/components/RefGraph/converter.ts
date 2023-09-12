@@ -2,10 +2,10 @@ import { TreeGraphData } from "@antv/g6";
 import {
   CallGraphNode,
   isInternalCodeModule,
-} from "ts-project-toolkit/src/analyzeCallGraph";
+} from "ts-project-toolkit";
 import { calculateNodeSize } from "../../../../helper/compute";
 import uniqueId from "lodash/uniqueId";
-import { GlobalToken } from "antd/lib";
+import { GlobalToken } from "antd/lib/theme";
 
 export interface ConvertConfig {
   ignore?: {

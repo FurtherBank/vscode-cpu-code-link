@@ -1,12 +1,4 @@
-import fs from "fs";
-import { ImportInfo } from "./analyzeImports";
 import { ExportItem, ExportType } from "./analyzeExports";
-
-export type CallGraphNode = Omit<ImportInfo, "namedImports"> & {
-  stat?: fs.Stats;
-  exportType?: "hook" | ExportType;
-  children?: CallGraphNode[];
-};
 
 const CodeExtension = [".ts", ".tsx", ".js", ".jsx"];
 

@@ -9,3 +9,4 @@ export * from "./utils/exportTest";
 export * from "./utils/promise";
 export * from "./project/CpuProject";
 export * from "./project/CpuProjectManager";
+export * from "./project/types";

@@ -1,4 +1,4 @@
-import { RefGraphApp } from "./App";
+import { RefGraphApp } from "./RefGraphApp";
 import { createRoot } from "react-dom/client";
 
 const container = document.getElementById("root");

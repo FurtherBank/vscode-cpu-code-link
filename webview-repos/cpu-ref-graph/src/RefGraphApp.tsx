@@ -10,6 +10,7 @@ import { CallGraphNode } from "ts-project-toolkit";
 interface AppState {
   refGraph?: CallGraphNode;
   isDark?: boolean;
+  projectPath?: string;
 }
 
 export const RefGraphApp = () => {
@@ -24,15 +25,13 @@ export const RefGraphApp = () => {
   }, []);
 
   const antdTheme = useMemo(() => {
-    return isDark
-      ? {
-          algorithm: [theme.darkAlgorithm, theme.compactAlgorithm],
-          // token: { colorPrimary: "#000000" },
-        }
-      : {
-          algorithm: [theme.compactAlgorithm],
-          // token: { colorPrimary: "#ffffff" },
-        };
+    return {
+      algorithm: isDark ? [theme.darkAlgorithm] : [],
+      token: {
+        borderRadius: 4,
+        sizeUnit: 2,
+      },
+    };
   }, [isDark]);
 
   if (!refGraph) {

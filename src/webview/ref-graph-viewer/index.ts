@@ -4,7 +4,8 @@ import { ITextEditorWebview } from "../../core/helper/editor/text/ITextEditor";
 import debounce from "lodash/debounce";
 import { findTsConfig } from "./findTsConfig";
 import { CpuProjectManager } from "ts-project-toolkit";
-import { VscodeRequest } from "./bridge/post";
+import { VscodeRequest } from "./bridge/request";
+import path from "path";
 
 export const RefGraphViewer = (
   bridge: CpuBridge<VscodeRequest, {}, any>,
@@ -47,6 +48,7 @@ export const RefGraphViewer = (
       }
       const realFilePath = document.uri.fsPath;
       const tsConfigFilePath = await findTsConfig(realFilePath);
+      const projectPath = path.dirname(tsConfigFilePath);
       console.time("openProject");
       const project = await CpuProjectManager.getProject(tsConfigFilePath);
       console.log("[main] 已经打开代码文件", tsConfigFilePath, realFilePath);
@@ -54,6 +56,7 @@ export const RefGraphViewer = (
       console.time("analyzeCallGraph");
       const message = {
         refGraph: project.getRefGraph(realFilePath),
+        projectPath,
         isDark:
           vscode.window.activeColorTheme.kind === vscode.ColorThemeKind.Dark,
       };

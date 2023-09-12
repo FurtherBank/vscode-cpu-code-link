@@ -1,7 +1,7 @@
 import { RefGraph } from "./components/RefGraph";
 import { CallGraphNode } from "ts-project-toolkit";
 import { useMemo, useState } from "react";
-import { Select, theme } from "antd/lib";
+import Select from "antd/lib/select";
 
 export interface RefGraphPageProps {
   data: CallGraphNode;

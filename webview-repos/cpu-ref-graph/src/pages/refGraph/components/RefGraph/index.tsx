@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from "react";
 import { CpuCodeRefGraph } from "../CpuCodeRefGraph";
 import { ConvertConfig, ConvertedTreeData, convertTreeData } from "./converter";
-import { theme } from "antd/lib";
-import { GraphItemInfo } from "../GraphItemInfo";
+import theme from "antd/lib/theme";
+import { GraphItemInfo } from "../../GraphItemInfo";
 import HoverToolTip from "../../../../components/base/HoverToolTip";
 import { IG6GraphEvent } from "@antv/g6";
 import { ItemType, MenuItemType } from "antd/lib/menu/hooks/useItems";

@@ -1,27 +1,16 @@
 import * as fs from "fs";
-import { Project, SourceFile } from "ts-morph";
+import { Project } from "ts-morph";
 import {
-  ExportInfo,
   ExportItem,
-  ExportType,
   analyzeExports,
 } from "../analyzeExports";
-import { ImportInfo, analyzeImports } from "../analyzeImports";
+import { analyzeImports } from "../analyzeImports";
 import {
-  CallGraphNode,
   getAggregateExportType,
   isInternalCodeModule,
 } from "../analyzeCallGraph";
 import path from "path";
-
-interface SourceFileInfo {
-  realFilePath: string;
-  sourceFile: SourceFile;
-  importModules: ImportInfo[];
-  exportModules: ExportInfo;
-  stat: fs.Stats;
-  exportType?: "hook" | ExportType;
-}
+import { CallGraphNode, FileBaseInfo, SourceFileInfo } from "./types";
 
 interface SourceFilesInfoMap {
   [realFilePath: string]: SourceFileInfo;
@@ -49,6 +38,8 @@ export class CpuProject {
       sourceFiles.map(async (sourceFile) => {
         // 这里 path 需要转化为 fs 格式的路径，否则会出现路径不一致的问题
         const realFilePath = path.resolve(sourceFile.getFilePath());
+        const projectPath = path.dirname(tsConfigFilePath);
+        const relativePath = path.relative(projectPath, realFilePath)
         const importModules = analyzeImports(sourceFile);
         const exportModules = analyzeExports(sourceFile);
         const stat = await fs.promises.stat(realFilePath);
@@ -60,6 +51,7 @@ export class CpuProject {
           importModules,
           exportModules,
           stat,
+          relativePath,
           exportType: getAggregateExportType(
             defaultExport ? namedExports.concat([defaultExport]) : namedExports
           ),
@@ -73,12 +65,19 @@ export class CpuProject {
     return new CpuProject(tsConfigFilePath, project, sourceFilesInfoMap);
   }
 
-  getFileBaseInfo(filePath: string) {
+  /**
+   * 获取代码文件的基本信息  
+   * 注：只有在项目内部文件的信息才能访问
+   * @param filePath 
+   * @returns 
+   */
+  getFileBaseInfo(filePath: string): FileBaseInfo {
     const sourceFileInfo = this.sourceFilesInfoMap[filePath];
     if (!sourceFileInfo) throw new Error(`[error] file not found: ${filePath}`);
     const { realFilePath, stat, exportType } = sourceFileInfo;
     return {
       realFilePath,
+      relativePath: path.relative(this.projectPath, realFilePath),
       stat,
       exportType,
     };
@@ -193,5 +192,9 @@ export class CpuProject {
         }
       })
       .filter(Boolean) as CallGraphNode[];
+  }
+
+  get projectPath() {
+    return path.dirname(this.tsConfigFilePath);
   }
 }

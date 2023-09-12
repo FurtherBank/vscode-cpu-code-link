@@ -1,4 +1,4 @@
-import { Menu } from "antd";
+import Menu from "antd/lib/menu";
 import { ItemType } from "antd/es/menu/hooks/useItems";
 import { MenuItemType } from "antd/lib/menu/hooks/useItems";
 import React, { useState, useEffect, useMemo } from "react";

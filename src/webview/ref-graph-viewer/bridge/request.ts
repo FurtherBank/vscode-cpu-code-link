@@ -4,5 +4,6 @@ export interface VscodeRequest {
   init: {
     isDark: boolean;
     refGraph: CallGraphNode;
+    projectPath: string;
   };
 }
