@@ -86,7 +86,7 @@ export const GraphItemInfo = (props: GraphItemInfoProps) => {
           <InfoItem title="文件路径">{relativePath}</InfoItem>
           <InfoItem title="大小">{(size / 1024).toFixed(3)} kb</InfoItem>
           <InfoItem title="创建于" extra={<TimeTip time={birthtime} />}>
-            {dayjs(birthtime).format("MMMM Do YYYY")}
+            {dayjs(birthtime).format("MMMM D YYYY")}
           </InfoItem>
         </div>
       )}

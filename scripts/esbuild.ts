@@ -14,7 +14,6 @@ const options = {
     "vscode",
     "path",
     "fs",
-    "ts-morph",
     "quicktype",
     ...tsconfig.exclude,
   ],

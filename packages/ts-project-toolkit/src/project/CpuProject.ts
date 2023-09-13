@@ -32,13 +32,13 @@ export class CpuProject {
     const project = new Project({
       tsConfigFilePath,
     });
+    const projectPath = path.dirname(tsConfigFilePath);
     const sourceFiles = project.getSourceFiles();
     const sourceFilesInfoMap = {} as CpuProject["sourceFilesInfoMap"];
     await Promise.all(
       sourceFiles.map(async (sourceFile) => {
         // 这里 path 需要转化为 fs 格式的路径，否则会出现路径不一致的问题
         const realFilePath = path.resolve(sourceFile.getFilePath());
-        const projectPath = path.dirname(tsConfigFilePath);
         const relativePath = path.relative(projectPath, realFilePath)
         const importModules = analyzeImports(sourceFile);
         const exportModules = analyzeExports(sourceFile);
@@ -129,11 +129,8 @@ export class CpuProject {
               exportModules: { defaultExport, namedExports },
               stat,
               exportType,
+              relativePath
             } = exportSourceFileInfo;
-            console.log(`[info] exports of ${importPath}`, {
-              defaultExport,
-              namedExports,
-            });
 
             // 根据文件导出信息完善 import 信息
             const importedItems = namedImports
@@ -152,6 +149,7 @@ export class CpuProject {
             if (!onlyTypeImports) {
               return {
                 realFilePath,
+                relativePath,
                 importPath,
                 defaultName,
                 namespaceName,

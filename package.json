@@ -3,7 +3,7 @@
   "displayName": "cpu-ref-graph",
   "publisher": "FurtherBank",
   "description": "",
-  "version": "0.0.5",
+  "version": "0.0.8",
   "repository": "https://github.com/FurtherBank/cpu-ref-graph",
   "engines": {
     "vscode": "^1.71.0"

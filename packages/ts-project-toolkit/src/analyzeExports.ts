@@ -72,8 +72,6 @@ export function analyzeExports(sourceFile: SourceFile): ExportInfo {
   const exportModulesInfo = exportModules.flatMap((exportDeclaration) => {
     const exportedSymbols = exportDeclaration.getNamedExports(); // 获取导出的符号
     return exportedSymbols.map((specifier) => {
-      console.log("Exported symbol name:", specifier.getName()); // 打印导出的符号名称
-      console.log("Symbol kind:", specifier.getKindName()); // 打印符号的类型（类、函数、变量等）
       return {
         name: specifier.getName(),
         isTypeOnly: specifier.isTypeOnly(),

@@ -62,6 +62,7 @@ export const RefGraphViewer = (
       };
       console.timeEnd("analyzeCallGraph");
 
+      console.log(message.refGraph);
       bridge.post("init", message);
     },
     500,
