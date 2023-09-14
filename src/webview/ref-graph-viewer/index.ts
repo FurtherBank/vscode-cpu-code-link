@@ -20,6 +20,12 @@ export const RefGraphViewer = (
       viewColumn: vscode.ViewColumn.One,
     });
   });
+  bridge.on("open-ref-graph", (payload) => {
+    const { path } = payload;
+    const fileUri = vscode.Uri.file(path);
+    // 打开只读文档
+    vscode.commands.executeCommand('vscode.openWith', fileUri, 'cpu-ref-graph.RefGraphViewer', vscode.ViewColumn.Two);
+  });
   const webview = {
     viewType: "RefGraphViewer",
     title: "RefGraphViewer",
@@ -62,7 +68,7 @@ export const RefGraphViewer = (
       };
       console.timeEnd("analyzeCallGraph");
 
-      console.log(message.refGraph);
+      console.log(JSON.stringify(message.refGraph));
       bridge.post("init", message);
     },
     500,

@@ -21,7 +21,20 @@ export const RefGraphApp = () => {
   useEffect(() => {
     return bridge.on("init", (data: AppState) => {
       setState(data);
+      bridge.vscode.setState(data);
     });
+  }, []);
+
+  // 读取 vscode state
+  useEffect(() => {
+    const state = bridge.vscode.getState();
+    if (state) {
+      window.postMessage({
+        action: "init",
+        payload: state,
+        requestId: "",
+      })
+    }
   }, []);
 
   const antdTheme = useMemo(() => {

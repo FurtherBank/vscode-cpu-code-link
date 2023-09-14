@@ -1,5 +1,5 @@
 import Card from "antd/lib/card";
-import Tag from "antd/lib/card";
+import Tag from "antd/lib/tag";
 import {
   ConvertedTreeData,
   getModuleTypeStyleToken,
@@ -43,7 +43,13 @@ const InfoItem = (props: InfoItemProps) => {
         >
           {title}
         </span>
-        {children}
+        <span
+          style={{
+            textOverflow: "ellipsis",
+          }}
+        >
+          {children}
+        </span>
       </div>
       {extra && (
         <div
@@ -83,8 +89,8 @@ export const GraphItemInfo = (props: GraphItemInfoProps) => {
     >
       {stat && (
         <div>
-          <InfoItem title="文件路径">{relativePath}</InfoItem>
-          <InfoItem title="大小">{(size / 1024).toFixed(3)} kb</InfoItem>
+          <InfoItem title="路径">{relativePath}</InfoItem>
+          <InfoItem title="大小">{(size / 1024).toFixed(3)} kB</InfoItem>
           <InfoItem title="创建于" extra={<TimeTip time={birthtime} />}>
             {dayjs(birthtime).format("MMMM D YYYY")}
           </InfoItem>

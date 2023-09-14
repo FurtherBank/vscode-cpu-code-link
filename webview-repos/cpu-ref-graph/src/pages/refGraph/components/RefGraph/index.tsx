@@ -62,6 +62,12 @@ export const RefGraph = (props: RelationGraphProps) => {
           onClick: () => {
             bridge.post("open", { path: item.originalData.realFilePath });
           },
+        },{
+          key: "openRefGraph",
+          label: "打开子图",
+          onClick: () => {
+            bridge.post("open-ref-graph", { path: item.originalData.realFilePath });
+          },
         });
       }
       setContextMenuItems(items);

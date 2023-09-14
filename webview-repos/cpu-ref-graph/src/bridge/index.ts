@@ -61,6 +61,7 @@ class CpuRefGraphBridge extends CpuBridge<RefGraphRequest, any> {
       window.addEventListener("message", realListener);
       return () => window.removeEventListener("message", realListener);
     });
+    this.vscode = vscode
   }
 }
 
