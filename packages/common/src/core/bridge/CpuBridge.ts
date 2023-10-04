@@ -70,10 +70,18 @@ export class CpuBridge<
       // requestId 存在，是对方 post 的请求
       if (requestId !== undefined) {
         console.log(`[bridge] receive request ${action}: ${requestId}`);
-        const responseData = this.handlers[action]
-          ? await this.handlers[action](payload)
-          : null;
-        if (requestId) this.response(requestId, action, responseData);
+        try {
+          const responseData = this.handlers[action]
+            ? await this.handlers[action](payload)
+            : null;
+          if (requestId) this.response(requestId, action, responseData);
+        } catch (error) {
+          console.error(`[bridge] ${action} error:`, error);
+          if (requestId) this.response(requestId, action, {
+            success: false,
+            error,
+          });
+        }
         return;
       }
 
@@ -98,7 +106,10 @@ export class CpuBridge<
     this.removeListener = observe(this.listener);
   }
 
-  public post<T extends keyof MyRequest & string>(action: T, payload: MyRequest[T]) {
+  public post<T extends keyof MyRequest & string>(
+    action: T,
+    payload: MyRequest[T]
+  ) {
     const requestId = uuid();
     this.agent.postMessage({
       action,
@@ -106,7 +117,7 @@ export class CpuBridge<
       requestId,
     });
     console.log(`[bridge] post ${action}: ${requestId}`);
-    
+
     const promise = new Promise((resolve, reject) => {
       // 超时处理
       setTimeout(() => {
@@ -137,7 +148,10 @@ export class CpuBridge<
     });
   }
 
-  on<T extends keyof AgentRequest & string>(action: T, handler: (payload: AgentRequest[T]) => any) {
+  on<T extends keyof AgentRequest & string>(
+    action: T,
+    handler: (payload: AgentRequest[T]) => any
+  ) {
     this.handlers[action] = handler;
     return () => {
       delete this.handlers[action];

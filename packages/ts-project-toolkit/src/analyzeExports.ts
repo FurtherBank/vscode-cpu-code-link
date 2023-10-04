@@ -11,6 +11,9 @@ export interface ExportItem {
   exportType?: ExportType;
 }
 
+/**
+ * 代码模块文件的所有导出信息
+ */
 export interface ExportInfo {
   defaultExport?: ExportItem;
   namedExports: ExportItem[];

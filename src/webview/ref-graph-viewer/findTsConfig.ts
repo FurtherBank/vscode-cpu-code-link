@@ -8,7 +8,6 @@ export async function findTsConfig(filePath: string): Promise<string> {
   }
   try {
     const tsConfigPath = path.join(currentDir, 'tsconfig.json');
-    console.log('try to access tsConfigPath', tsConfigPath);
     await fs.access(tsConfigPath);
     return tsConfigPath;
   } catch (error) {

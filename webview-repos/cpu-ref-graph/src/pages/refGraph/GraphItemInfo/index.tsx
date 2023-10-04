@@ -67,8 +67,11 @@ const InfoItem = (props: InfoItemProps) => {
 
 export const GraphItemInfo = (props: GraphItemInfoProps) => {
   const { data } = props;
-  const { moduleType, originalData, label } = data ?? {};
-  const { stat, relativePath } = originalData ?? {};
+  const { originalData, label } = data ?? {};
+  const {
+    baseInfo,
+  } = originalData ?? {};
+  const { relativePath, moduleType, stat } = baseInfo ?? {};
   const { size, birthtime } = stat ?? {};
 
   if (!data) {

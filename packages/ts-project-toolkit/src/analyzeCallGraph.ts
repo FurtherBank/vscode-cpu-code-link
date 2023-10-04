@@ -1,4 +1,5 @@
-import { ExportItem, ExportType } from "./analyzeExports";
+import { ExportInfo, ExportItem } from "./analyzeExports";
+import { ModuleType } from "./project/types";
 
 const CodeExtension = [".ts", ".tsx", ".js", ".jsx"];
 
@@ -17,12 +18,18 @@ export const isInternalCodeModule = (realFilePath: string | undefined) => {
 };
 
 /**
- * 根据导出信息获取导出内容类型
+ * 根据导出信息确定模块类型
  * @param items
  */
-export const getAggregateExportType = (
-  items: ExportItem[]
-): ExportType | "hook" => {
+export const getModuleType = (
+  realFilePath: string | undefined,
+  exportInfo: ExportInfo
+): ModuleType => {
+  const ext = realFilePath?.split(".").pop() ?? "";
+  const items = [exportInfo.defaultExport, ...exportInfo.namedExports].filter(
+    Boolean
+  ) as ExportItem[];
+  if (!isInternalCodeModule(realFilePath)) return "external";
   if (
     items.find(
       (item) => item.name.startsWith("use") && item.exportType !== "class"
@@ -30,7 +37,9 @@ export const getAggregateExportType = (
   ) {
     return "hook";
   }
-  return ["class", "function", "variable"].find((exportType) => {
-    return items.find((item) => item.exportType === exportType);
-  }) as ExportType;
+  if (["tsx", "jsx"].includes(ext)) return "jsx";
+  if (items.find((item) => item.exportType === "class")) return "class";
+  if (["ts", "js"].includes(ext)) return "js";
+
+  return "external";
 };

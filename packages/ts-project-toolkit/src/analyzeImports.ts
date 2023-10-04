@@ -2,8 +2,17 @@ import path from 'path';
 import { SourceFile } from 'ts-morph';
 
 export interface ImportInfo {
+  /**
+   * import 语法所写的路径字符串
+   */
   importPath: string;
+  /**
+   * 导入的真实文件路径
+   */
   realFilePath?: string;
+  /**
+   * 引入的默认导出名称
+   */
   defaultName?: string;
   namespaceName?: string;
   namedImports: string[];

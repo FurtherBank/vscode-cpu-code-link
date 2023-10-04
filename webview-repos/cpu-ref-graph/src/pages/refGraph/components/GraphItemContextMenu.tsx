@@ -7,7 +7,7 @@ interface GraphItemContextMenuProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
   position: { x: number; y: number };
-  items?: ItemType<MenuItemType>[]
+  items?: ItemType<MenuItemType>[];
 }
 
 export const GraphItemContextMenu = (props: GraphItemContextMenuProps) => {
@@ -64,13 +64,13 @@ export const GraphItemContextMenu = (props: GraphItemContextMenuProps) => {
     <div
       style={{
         position: "fixed",
-        display: visible && items.length > 0? "block" : "none",
+        display: visible && items.length > 0 ? "block" : "none",
         left: realPosition.x,
         top: realPosition.y,
       }}
       ref={ref}
     >
-      <Menu items={items} onClick={handleMenuClick}/>
+      <Menu items={items} onClick={handleMenuClick} />
     </div>
   );
 };

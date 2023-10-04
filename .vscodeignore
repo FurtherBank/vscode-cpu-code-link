@@ -9,6 +9,8 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/*.map
 **/*.ts
+**/*.test.ts
+**/*.test.tsx
 **/node_modules/**
 webview-repos/**/*.*
 !webview-repos/*/build/**

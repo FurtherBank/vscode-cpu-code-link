@@ -55,18 +55,43 @@ export const RefGraph = (props: RelationGraphProps) => {
       setContextMenuPos(position);
       setContextMenuVisible(true);
       const items = [];
-      if (item.moduleType !== "external") {
-        items.push({
-          key: "openInEditor",
-          label: "在编辑器中打开",
-          onClick: () => {
-            bridge.post("open", { path: item.originalData.realFilePath });
+      const {
+        baseInfo: { realFilePath, moduleFileName, moduleType },
+      } = item.originalData;
+      if (moduleType !== "external") {
+        items.push(
+          {
+            key: "openInEditor",
+            label: "在编辑器中打开",
+            onClick: () => {
+              bridge.post("open", { path: realFilePath });
+            },
           },
-        },{
-          key: "openRefGraph",
-          label: "打开子图",
+          {
+            key: "openRefGraph",
+            label: "打开子图",
+            onClick: () => {
+              bridge.post("open-ref-graph", {
+                path: realFilePath,
+              });
+            },
+          }
+        );
+      }
+      if (moduleFileName !== "index") {
+        items.push({
+          key: "refactor-index",
+          label: "重构为 index",
           onClick: () => {
-            bridge.post("open-ref-graph", { path: item.originalData.realFilePath });
+            bridge.post("refactor-index", { path: realFilePath });
+          },
+        });
+      } else if (moduleFileName) {
+        items.push({
+          key: "refactor-restore",
+          label: "还原目录名称",
+          onClick: () => {
+            bridge.post("refactor-restore", { path: realFilePath });
           },
         });
       }

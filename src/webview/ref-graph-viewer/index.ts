@@ -6,6 +6,7 @@ import { findTsConfig } from "./findTsConfig";
 import { CpuProjectManager } from "ts-project-toolkit";
 import { VscodeRequest } from "./bridge/request";
 import path from "path";
+import { registerListeners } from "./bridge/listeners";
 
 export const RefGraphViewer = (
   bridge: CpuBridge<VscodeRequest, {}, any>,
@@ -13,19 +14,6 @@ export const RefGraphViewer = (
   webviewPanel: vscode.WebviewPanel,
   _token: vscode.CancellationToken
 ): ITextEditorWebview => {
-  bridge.on("open", (payload) => {
-    const { path } = payload;
-    const fileUri = vscode.Uri.file(path);
-    vscode.window.showTextDocument(fileUri, {
-      viewColumn: vscode.ViewColumn.One,
-    });
-  });
-  bridge.on("open-ref-graph", (payload) => {
-    const { path } = payload;
-    const fileUri = vscode.Uri.file(path);
-    // 打开只读文档
-    vscode.commands.executeCommand('vscode.openWith', fileUri, 'cpu-ref-graph.RefGraphViewer', vscode.ViewColumn.Two);
-  });
   const webview = {
     viewType: "RefGraphViewer",
     title: "RefGraphViewer",
@@ -68,7 +56,9 @@ export const RefGraphViewer = (
       };
       console.timeEnd("analyzeCallGraph");
 
-      console.log(JSON.stringify(message.refGraph));
+      // console.log(JSON.stringify(message.refGraph));
+      console.log("[main] result:", message.refGraph);
+      registerListeners(bridge, project);
       bridge.post("init", message);
     },
     500,

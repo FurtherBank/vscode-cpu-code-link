@@ -1,8 +1,5 @@
 import { TreeGraphData } from "@antv/g6";
-import {
-  CallGraphNode,
-  isInternalCodeModule,
-} from "ts-project-toolkit";
+import { CallGraphNode } from "ts-project-toolkit";
 import { calculateNodeSize } from "../../../../helper/compute";
 import uniqueId from "lodash/uniqueId";
 import { GlobalToken } from "antd/lib/theme";
@@ -17,42 +14,21 @@ export interface ConvertConfig {
   };
 }
 
-export interface ConvertedTreeData extends TreeGraphData {
-  originalData: CallGraphNode;
-  moduleType: ModuleType;
-}
-
-const getModuleType = (data: CallGraphNode): ModuleType => {
-  const {
-    importPath,
-    realFilePath,
-    exportType,
-    defaultName,
-    namespaceName,
-    children,
-  } = data;
-  const ext = realFilePath?.split(".").pop() ?? "";
-  
-  if (!isInternalCodeModule(realFilePath)) return 'external';
-  if (exportType === "hook") return 'hook';
-  if (["tsx", "jsx"].includes(ext)) return 'jsx';
-  if (exportType === "class") return 'class';
-  if (["ts", "js"].includes(ext)) return 'js';
-
-  return 'external';
-}
-
 export type ModuleType = "external" | "hook" | "class" | "jsx" | "js";
 
+export interface ConvertedTreeData extends TreeGraphData {
+  originalData: CallGraphNode;
+}
+
 export const getModuleTypeStyleToken = (
-  type: ModuleType,
+  type: ModuleType
 ): keyof GlobalToken => {
   const moduleTypeStyleMap = {
-    jsx: 'blue',
-    js: 'yellow',
-    class: 'green',
-    hook: 'orange',
-    external: 'colorTextDisabled',
+    jsx: "blue",
+    js: "yellow",
+    class: "green",
+    hook: "orange",
+    external: "colorTextDisabled",
   } as const;
 
   // 注意优先级顺序
@@ -62,17 +38,17 @@ export const getModuleTypeStyleToken = (
   if (type === "jsx") return moduleTypeStyleMap.jsx;
   if (type === "js") return moduleTypeStyleMap.js;
 
-  return moduleTypeStyleMap.external
+  return moduleTypeStyleMap.external;
 };
 
 /**
- * 将`CallGraphNode`转换为`TreeGraphData`  
+ * 将`CallGraphNode`转换为`TreeGraphData`
  * 并计算节点和`CallGraphNode`有关的属性
- * @param data 
- * @param isDark 
- * @param config 
- * @param pointer 
- * @returns 
+ * @param data
+ * @param isDark
+ * @param config
+ * @param pointer
+ * @returns
  */
 export const convertTreeData = (
   token: GlobalToken,
@@ -83,18 +59,18 @@ export const convertTreeData = (
   try {
     const {
       importPath,
-      realFilePath,
+      baseInfo: {
+        moduleType = "external",
+        moduleName,
+        stat: { size = 0 } = {},
+      },
       defaultName,
       namespaceName,
       children,
-      stat: { size = 0 } = {},
     } = data;
-    const label = importPath.split("/").pop() ?? "";
+    const label = moduleName ?? importPath.split("/").pop() ?? "";
     const depth = pointer.length;
     const filePointer = pointer.concat([label]);
-
-    // 计算模块参数
-    const moduleType = getModuleType(data);
 
     // 对非根节点进行过滤
     if (pointer.length > 0) {
@@ -108,7 +84,7 @@ export const convertTreeData = (
         convertTreeData(token, child, config, filePointer)
       )
       .filter(Boolean);
-    
+
     // 计算节点属性
     const treeData = {
       id: uniqueId(),
@@ -123,7 +99,6 @@ export const convertTreeData = (
         stroke: token[getModuleTypeStyleToken(moduleType)],
         lineWidth: calculateNodeSize(size),
       },
-      moduleType,
       collapsed: treeDataChildren?.length > 0 && depth >= 3,
       originalData: data,
     } as ConvertedTreeData;

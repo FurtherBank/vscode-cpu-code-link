@@ -1,16 +1,11 @@
 import * as fs from "fs";
-import { Project } from "ts-morph";
-import {
-  ExportItem,
-  analyzeExports,
-} from "../analyzeExports";
+import { Project, SourceFile } from "ts-morph";
+import { ExportItem, analyzeExports } from "../analyzeExports";
 import { analyzeImports } from "../analyzeImports";
-import {
-  getAggregateExportType,
-  isInternalCodeModule,
-} from "../analyzeCallGraph";
+import { getModuleType, isInternalCodeModule } from "../analyzeCallGraph";
 import path from "path";
-import { CallGraphNode, FileBaseInfo, SourceFileInfo } from "./types";
+import { CallGraphNode, SourceFileInfo } from "./types";
+import { getModuleFileName, getModuleName } from "../helper/filePath";
 
 interface SourceFilesInfoMap {
   [realFilePath: string]: SourceFileInfo;
@@ -32,30 +27,17 @@ export class CpuProject {
     const project = new Project({
       tsConfigFilePath,
     });
-    const projectPath = path.dirname(tsConfigFilePath);
     const sourceFiles = project.getSourceFiles();
     const sourceFilesInfoMap = {} as CpuProject["sourceFilesInfoMap"];
     await Promise.all(
       sourceFiles.map(async (sourceFile) => {
         // 这里 path 需要转化为 fs 格式的路径，否则会出现路径不一致的问题
         const realFilePath = path.resolve(sourceFile.getFilePath());
-        const relativePath = path.relative(projectPath, realFilePath)
-        const importModules = analyzeImports(sourceFile);
-        const exportModules = analyzeExports(sourceFile);
-        const stat = await fs.promises.stat(realFilePath);
 
-        const { defaultExport, namedExports } = exportModules;
-        sourceFilesInfoMap[realFilePath] = {
-          realFilePath,
-          sourceFile,
-          importModules,
-          exportModules,
-          stat,
-          relativePath,
-          exportType: getAggregateExportType(
-            defaultExport ? namedExports.concat([defaultExport]) : namedExports
-          ),
-        };
+        sourceFilesInfoMap[realFilePath] = await CpuProject.getSourceFileInfo(
+          tsConfigFilePath,
+          sourceFile
+        );
       })
     );
     console.timeEnd(`📂 create project: ${tsConfigFilePath}`);
@@ -65,33 +47,41 @@ export class CpuProject {
     return new CpuProject(tsConfigFilePath, project, sourceFilesInfoMap);
   }
 
-  /**
-   * 获取代码文件的基本信息  
-   * 注：只有在项目内部文件的信息才能访问
-   * @param filePath 
-   * @returns 
-   */
-  getFileBaseInfo(filePath: string): FileBaseInfo {
-    const sourceFileInfo = this.sourceFilesInfoMap[filePath];
-    if (!sourceFileInfo) throw new Error(`[error] file not found: ${filePath}`);
-    const { realFilePath, stat, exportType } = sourceFileInfo;
+  static async getSourceFileInfo(
+    tsConfigFilePath: string,
+    sourceFile: SourceFile
+  ): Promise<SourceFileInfo> {
+    const projectPath = path.dirname(tsConfigFilePath);
+    // 这里 path 需要转化为 fs 格式的路径，否则会出现路径不一致的问题
+    const realFilePath = path.resolve(sourceFile.getFilePath());
+    const relativePath = path.relative(projectPath, realFilePath);
+    const stat = await fs.promises.stat(realFilePath);
+    const importModules = analyzeImports(sourceFile);
+    const exportModules = analyzeExports(sourceFile);
+
     return {
-      realFilePath,
-      relativePath: path.relative(this.projectPath, realFilePath),
-      stat,
-      exportType,
+      baseInfo: {
+        realFilePath,
+        relativePath,
+        stat,
+        moduleType: getModuleType(realFilePath, exportModules),
+        moduleName: getModuleName(realFilePath),
+        moduleFileName: getModuleFileName(realFilePath),
+      },
+      importModules,
+      exportModules,
+      sourceFile,
     };
   }
-
   /**
    * 获取引用关系图
    * @param filePath
    * @returns
    */
   getRefGraph(filePath: string) {
-    const sourceFileInfo = this.getFileBaseInfo(filePath);
+    const { baseInfo } = this.sourceFilesInfoMap[filePath];
     return {
-      ...sourceFileInfo,
+      baseInfo,
       importPath: path.basename(filePath, path.extname(filePath)),
       children: this.analyzeCallGraphChildren(filePath) as CallGraphNode[],
     };
@@ -127,9 +117,7 @@ export class CpuProject {
           if (exportSourceFileInfo) {
             const {
               exportModules: { defaultExport, namedExports },
-              stat,
-              exportType,
-              relativePath
+              baseInfo,
             } = exportSourceFileInfo;
 
             // 根据文件导出信息完善 import 信息
@@ -148,13 +136,10 @@ export class CpuProject {
             );
             if (!onlyTypeImports) {
               return {
-                realFilePath,
-                relativePath,
+                baseInfo,
                 importPath,
                 defaultName,
                 namespaceName,
-                exportType,
-                stat,
                 // children 在下一个 map 中计算，从而实现层次遍历，解决文件重叠在浅层的问题
                 children: realFilePath,
               };
@@ -165,16 +150,18 @@ export class CpuProject {
         }
         // 非内部模块的情况
         return {
-          realFilePath,
+          baseInfo: {
+            realFilePath,
+            moduleType: "external",
+          },
           importPath,
           defaultName,
           namespaceName,
+          children: undefined,
         };
       })
       .map((item) => {
-        if (!item) {
-          return false;
-        } else {
+        if (item) {
           if (item.children) {
             const { children: realFilePath } = item;
             const children = this.analyzeCallGraphChildren(
@@ -188,6 +175,7 @@ export class CpuProject {
           }
           return item;
         }
+        return false;
       })
       .filter(Boolean) as CallGraphNode[];
   }
